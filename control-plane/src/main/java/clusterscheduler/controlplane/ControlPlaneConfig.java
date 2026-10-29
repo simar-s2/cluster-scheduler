@@ -15,7 +15,9 @@ public record ControlPlaneConfig(
         int schedulingBatchSize,
         long reconcileIntervalMillis,
         long heartbeatTimeoutMillis,
-        long resendAfterMillis) {
+        long resendAfterMillis,
+        long leaseDurationMillis,
+        long leaseRenewIntervalMillis) {
 
     /**
      * Reads the settings from a map of variables, such as System.getenv().
@@ -35,7 +37,10 @@ public record ControlPlaneConfig(
                 settings.number("RECONCILE_INTERVAL_MILLIS", 1_000),
                 // Five missed one-second heartbeats before a node counts as dead.
                 settings.number("HEARTBEAT_TIMEOUT_MILLIS", 5_000),
-                settings.number("RESEND_AFTER_MILLIS", 3_000));
+                settings.number("RESEND_AFTER_MILLIS", 3_000),
+                // A standby takes over within about this long after the leader dies.
+                settings.number("LEASE_DURATION_MILLIS", 2_000),
+                settings.number("LEASE_RENEW_INTERVAL_MILLIS", 500));
     }
 
     private record Settings(Map<String, String> variables) {
