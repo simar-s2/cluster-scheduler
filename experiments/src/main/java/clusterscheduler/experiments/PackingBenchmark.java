@@ -66,6 +66,7 @@ public final class PackingBenchmark {
             Stats secondsEachJobWaitedForPlacement,
             double meanSchedulingPassMillis,
             Stats workerContainerMemoryMib,
+            long nodesDeclaredDead,
             long jobsWithOverlappingActiveAssignmentsInDatabase,
             List<Sample> samples) {}
 
@@ -159,6 +160,8 @@ public final class PackingBenchmark {
                             """)),
                     meanSchedulingPassMillis(database.readLease().holder()),
                     Stats.of(workerMemoryMib),
+                    // Should be 0. A worker killed by the out-of-memory killer would show up here.
+                    database.queryNumber("SELECT count(*) FROM nodes WHERE status = 'DEAD'"),
                     database.jobsWithOverlappingActiveAssignments(),
                     samples);
             log.info("Wrote {}", ResultsFile.write("packing", results));
