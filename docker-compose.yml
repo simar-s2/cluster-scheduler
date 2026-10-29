@@ -36,18 +36,27 @@ services:
     environment:
       REPLICA_ID: control-plane-1
       DATABASE_URL: jdbc:postgresql://postgres:5432/scheduler
+    ports:
+      # Prometheus metrics at http://localhost:8081/metrics
+      - "127.0.0.1:8081:8080"
 
   control-plane-2:
     <<: *control-plane
     environment:
       REPLICA_ID: control-plane-2
       DATABASE_URL: jdbc:postgresql://postgres:5432/scheduler
+    ports:
+      # Prometheus metrics at http://localhost:8082/metrics
+      - "127.0.0.1:8082:8080"
 
   control-plane-3:
     <<: *control-plane
     environment:
       REPLICA_ID: control-plane-3
       DATABASE_URL: jdbc:postgresql://postgres:5432/scheduler
+    ports:
+      # Prometheus metrics at http://localhost:8083/metrics
+      - "127.0.0.1:8083:8080"
 
   # Scale with: docker compose up --scale worker=N
   worker:
