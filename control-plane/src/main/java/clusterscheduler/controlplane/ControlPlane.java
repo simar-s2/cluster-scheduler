@@ -2,6 +2,7 @@ package clusterscheduler.controlplane;
 
 import clusterscheduler.controlplane.database.Database;
 import clusterscheduler.controlplane.database.SchemaInitializer;
+import clusterscheduler.controlplane.state.JobRepository;
 import clusterscheduler.controlplane.state.NodeRepository;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -22,9 +23,10 @@ public final class ControlPlane implements AutoCloseable {
         Database database = new Database(config.databaseUrl(), config.databaseUser(), config.databasePassword());
         SchemaInitializer.apply(database);
         NodeRepository nodeRepository = new NodeRepository(database);
+        JobRepository jobRepository = new JobRepository(database);
 
         Server grpcServer = ServerBuilder.forPort(config.grpcPort())
-                .addService(new ControlPlaneService(nodeRepository))
+                .addService(new ControlPlaneService(nodeRepository, jobRepository))
                 .build()
                 .start();
         return new ControlPlane(database, grpcServer);

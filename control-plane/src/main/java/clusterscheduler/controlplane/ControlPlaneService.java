@@ -1,12 +1,15 @@
 package clusterscheduler.controlplane;
 
 import clusterscheduler.controlplane.database.DatabaseException;
+import clusterscheduler.controlplane.state.JobRepository;
 import clusterscheduler.controlplane.state.NodeRepository;
 import clusterscheduler.proto.ControlPlaneGrpc;
 import clusterscheduler.proto.HeartbeatRequest;
 import clusterscheduler.proto.HeartbeatResponse;
 import clusterscheduler.proto.RegisterNodeRequest;
 import clusterscheduler.proto.RegisterNodeResponse;
+import clusterscheduler.proto.SubmitJobRequest;
+import clusterscheduler.proto.SubmitJobResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.util.function.Supplier;
@@ -21,9 +24,11 @@ final class ControlPlaneService extends ControlPlaneGrpc.ControlPlaneImplBase {
     private static final Logger log = LoggerFactory.getLogger(ControlPlaneService.class);
 
     private final NodeRepository nodeRepository;
+    private final JobRepository jobRepository;
 
-    ControlPlaneService(NodeRepository nodeRepository) {
+    ControlPlaneService(NodeRepository nodeRepository, JobRepository jobRepository) {
         this.nodeRepository = nodeRepository;
+        this.jobRepository = jobRepository;
     }
 
     @Override
@@ -49,6 +54,22 @@ final class ControlPlaneService extends ControlPlaneGrpc.ControlPlaneImplBase {
                     request.getFree().getCpuMillis(),
                     request.getFree().getMemoryMb());
             return HeartbeatResponse.newBuilder().setMustReregister(!nodeIsKnown).build();
+        });
+    }
+
+    @Override
+    public void submitJob(SubmitJobRequest request, StreamObserver<SubmitJobResponse> responseObserver) {
+        respond(responseObserver, () -> {
+            requireThat(!request.getJobId().isBlank(), "job_id is required");
+            requireThat(request.getRequested().getCpuMillis() > 0, "requested.cpu_millis must be positive");
+            requireThat(request.getRequested().getMemoryMb() > 0, "requested.memory_mb must be positive");
+            requireThat(request.getDurationMillis() >= 0, "duration_millis must not be negative");
+            jobRepository.submit(
+                    request.getJobId(),
+                    request.getRequested().getCpuMillis(),
+                    request.getRequested().getMemoryMb(),
+                    request.getDurationMillis());
+            return SubmitJobResponse.getDefaultInstance();
         });
     }
 
