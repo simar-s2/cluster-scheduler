@@ -235,3 +235,54 @@ So that only one piece of code decides placement. The scheduler already does bes
 
 **A node is declared dead but was actually alive. What happens?**
 Its jobs are already placed elsewhere. On its next heartbeat it gets `must_reregister`, stops all its tasks, and registers as a new, empty node. Until that heartbeat gets through, it may still be running those tasks; a self-fencing timeout on the worker would close that window.
+
+## Milestone 5: leader election with leases
+
+### What was built
+
+- **A one-row `leader_lease` table** (`holder`, `epoch`, `expires_at`).
+- **`LeaseRepository`.** `tryAcquire` takes the lease only if it has expired, and adds one to the epoch. `renew` extends it only for the same holder, the same epoch, and only while it is unexpired.
+- **`Leadership`**, the replica's own view of its term, with a local deadline.
+- **`LeaderElector`.** Every 500 ms the leader renews and a standby tries to acquire. The lease lasts 2 s.
+- **Scheduling and reconcile run only while `Leadership` says this replica leads**, and every `AssignTask` carries the leader's epoch.
+- **Compose runs three replicas** (`control-plane-1..3`). Workers get all three addresses.
+- **Tests.** `LeaseRepositoryTest` covers acquire, renew and expiry. `LeadershipTest` covers the deadline with a fake clock. `LeaderFailoverTest` covers:
+  - never more than one leader;
+  - a crashed leader replaced by a higher epoch;
+  - scheduling continues after failover with no job placed twice;
+  - heartbeats still recorded while there is no leader.
+- **A manual check in Docker:** killing the leader container gave a new leader about 1.9 s later.
+
+### Why it is designed this way
+
+**PostgreSQL as the lock service.** Raft, etcd or ZooKeeper would be the textbook choice, but they add a second consistent store to run and keep in sync. Here all state is already in PostgreSQL, and the leader is useless without it anyway. A single row updated with a conditional `UPDATE` is a linearizable compare-and-set, which is everything a lease needs. The availability of election equals the availability of the data, which is the right coupling.
+
+**Acquire is one conditional statement.** `UPDATE leader_lease SET holder = me, epoch = epoch + 1, expires_at = now() + 2s WHERE expires_at <= now()`. If two standbys race, the row lock makes one wait. When it continues, PostgreSQL re-checks `expires_at <= now()` against the winner's row, which now expires in the future, so the second one updates nothing. There is no read-then-write gap to exploit.
+
+**The epoch goes up on every change of holder, never on renewal.** It numbers terms. Renewing keeps the term, and taking over starts a new one. That is what lets an epoch serve as a fencing token in milestone 6.
+
+**An expired lease is never renewed, even by its own holder.** If the lease expired, someone else may have taken it and given it back during that time, and the holder cannot tell. Going through `tryAcquire` again starts a new epoch, so "my lease expired" always means "my term is over".
+
+**The leader also keeps its own deadline.** The database knows when the lease expires, but the leader cannot ask before every action. `Leadership` sets a local deadline of (time the renewal was sent) + 2 s, using `System.nanoTime`, which only moves forward. The database computes its expiry from when it ran the `UPDATE`, which is no earlier, so the local deadline always passes first. A leader that cannot reach the database stops scheduling on its own, without being told. This is about not wasting work. Milestone 6 makes correctness independent of it.
+
+**A restarted replica starts from scratch.** After a crash and restart it does not know the epoch it held, so it cannot renew. It waits for the lease to expire and acquires a new term like anyone else.
+
+**Lease duration 2 s, renew every 500 ms.** The leader can miss three renewals in a row (a slow query, a short GC pause) before it loses leadership. A standby notices an expired lease within one renew interval. Failover therefore takes 2 to 2.5 s after the leader dies. A shorter lease fails over faster but costs more writes, and a slow moment is more likely to lose the lease.
+
+### Tradeoffs
+
+- **Failover can never be faster than the lease.** A crashed leader is only detected by its lease running out. Ending a lease early on clean shutdown would speed up planned restarts, but crashes are what matter here.
+- **PostgreSQL is still a single point of failure.** If it is down, no one can lead, and nothing else can happen either. A highly available PostgreSQL (streaming replication with failover) would be the next step in production.
+- **Time-based leases cannot stop a paused leader.** A leader frozen by a long GC pause or a stopped container still believes it leads when it wakes up, until its local deadline check runs. Between the check and the write, it could act on an expired term. This is exactly the gap fencing tokens close in milestone 6.
+- **A full cold start could misjudge heartbeats.** If every replica is down for longer than the heartbeat timeout, heartbeats stop landing, and the first new leader would see every node overdue. Workers would re-register and lose their tasks. With three replicas, the chance of all being down at once is what this design accepts.
+
+### Interview questions
+
+**Why use a PostgreSQL row for leader election instead of etcd or ZooKeeper?**
+The only thing election needs is an atomic compare-and-set with an expiry, and a conditional `UPDATE` on one row is exactly that. The leader cannot do anything without PostgreSQL anyway, so a separate coordination service would add operational load without adding availability.
+
+**Two standbys see the expired lease at the same moment. What happens?**
+Both send the conditional `UPDATE`. PostgreSQL locks the row for the first, and the second waits. When the second continues, its `WHERE expires_at <= now()` is re-evaluated against the new row, which now expires in the future, so it updates nothing and gets no epoch.
+
+**If the database knows when the lease expires, why does the leader keep its own deadline?**
+So it can stop acting without a database round trip, for example when it cannot reach the database at all. The deadline is measured from when the renewal was sent, so it always ends before the database's expiry. It is an optimization. The safety guarantee comes from the epoch check on every write.
