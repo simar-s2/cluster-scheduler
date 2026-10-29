@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.postgresql)
     implementation(libs.hikaricp)
     implementation(libs.slf4j.api)
+    implementation(libs.micrometer.prometheus)
     runtimeOnly(libs.slf4j.simple)
     // Compile scope, not just runtime: the server is built with
     // NettyServerBuilder so it can bind to a chosen network interface.
