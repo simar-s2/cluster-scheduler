@@ -10,7 +10,9 @@ public record ControlPlaneConfig(
         int grpcPort,
         String databaseUrl,
         String databaseUser,
-        String databasePassword) {
+        String databasePassword,
+        long schedulingIntervalMillis,
+        int schedulingBatchSize) {
 
     /**
      * Reads the settings from a map of variables, such as System.getenv().
@@ -24,7 +26,9 @@ public record ControlPlaneConfig(
                 (int) settings.number("GRPC_PORT", 9090),
                 settings.text("DATABASE_URL", "jdbc:postgresql://localhost:5432/scheduler"),
                 settings.text("DATABASE_USER", "scheduler"),
-                settings.text("DATABASE_PASSWORD", "scheduler"));
+                settings.text("DATABASE_PASSWORD", "scheduler"),
+                settings.number("SCHEDULING_INTERVAL_MILLIS", 100),
+                (int) settings.number("SCHEDULING_BATCH_SIZE", 1_000));
     }
 
     private record Settings(Map<String, String> variables) {
