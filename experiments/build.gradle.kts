@@ -47,3 +47,8 @@ registerExperiment(
     "failoverChaos",
     "clusterscheduler.experiments.FailoverChaosExperiment",
     "Kill and pause the leader 200 times while submitting jobs, then count double placements")
+
+registerExperiment(
+    "nodeFailure",
+    "clusterscheduler.experiments.NodeFailureExperiment",
+    "Kill a worker and measure the time until all its tasks run on other nodes")
