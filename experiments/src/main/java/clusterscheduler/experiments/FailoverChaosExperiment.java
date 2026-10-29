@@ -44,7 +44,7 @@ public final class FailoverChaosExperiment {
 
     record Results(
             String experiment,
-            Instant finishedAt,
+            String finishedAt,
             Config config,
             Failovers failovers,
             Jobs jobs,
@@ -111,7 +111,7 @@ public final class FailoverChaosExperiment {
             long finished = database.queryNumber(finishedQuery, (Object) acceptedIds);
             Results results = new Results(
                     "failover-chaos",
-                    Instant.now(),
+                    Instant.now().toString(),
                     config,
                     new Failovers(config.failovers(), kills, pauses, Stats.of(millisUntilNewLeader)),
                     new Jobs(acceptedIds.length, jobStream.notAccepted(), finished, acceptedIds.length - finished),
