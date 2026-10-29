@@ -4,6 +4,7 @@ import clusterscheduler.proto.HeartbeatRequest;
 import clusterscheduler.proto.HeartbeatResponse;
 import clusterscheduler.proto.RegisterNodeRequest;
 import clusterscheduler.proto.Resources;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,11 @@ final class HeartbeatLoop implements AutoCloseable {
     private final long intervalMillis;
     private final ScheduledExecutorService timer =
             Executors.newSingleThreadScheduledExecutor(runnable -> new Thread(runnable, "heartbeat"));
+
+    // The ID for the registration in progress. It stays the same across
+    // retries, so a retry after a lost response does not create a second node,
+    // and is cleared once registration succeeds. Only the timer thread uses it.
+    private String pendingRegistrationId;
 
     HeartbeatLoop(
             ControlPlaneClient controlPlane,
@@ -80,11 +86,16 @@ final class HeartbeatLoop implements AutoCloseable {
     }
 
     private void register() {
+        if (pendingRegistrationId == null) {
+            pendingRegistrationId = UUID.randomUUID().toString();
+        }
         RegisterNodeRequest request = RegisterNodeRequest.newBuilder()
+                .setRegistrationId(pendingRegistrationId)
                 .setAddress(address)
                 .setCapacity(capacity)
                 .build();
         String nodeId = controlPlane.registerNode(request).getNodeId();
+        pendingRegistrationId = null;
         identity.set(nodeId);
         log.info("Registered as node {} at {}", nodeId, address);
     }
