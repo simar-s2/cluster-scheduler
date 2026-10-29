@@ -7,6 +7,8 @@ protobuf = "3.25.9"
 postgresql = "42.7.14"
 hikaricp = "7.1.0"
 slf4j = "2.0.20"
+junit = "5.14.4"
+testcontainers = "2.0.5"
 
 [libraries]
 grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
@@ -16,6 +18,10 @@ postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" 
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 
 [plugins]
 protobuf = { id = "com.google.protobuf", version = "0.10.0" }

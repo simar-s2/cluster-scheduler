@@ -18,6 +18,20 @@ dependencies {
     implementation(libs.slf4j.api)
     runtimeOnly(libs.slf4j.simple)
     runtimeOnly(libs.grpc.netty.shaded)
+
+    // Integration tests start real workers against a real PostgreSQL.
+    testImplementation(project(":worker"))
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.testcontainers.postgresql)
+    testRuntimeOnly(libs.junit.platform.launcher)
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "failed", "skipped")
+    }
 }
 
 application {
