@@ -286,3 +286,66 @@ Both send the conditional `UPDATE`. PostgreSQL locks the row for the first, and 
 
 **If the database knows when the lease expires, why does the leader keep its own deadline?**
 So it can stop acting without a database round trip, for example when it cannot reach the database at all. The deadline is measured from when the renewal was sent, so it always ends before the database's expiry. It is an optimization. The safety guarantee comes from the epoch check on every write.
+
+## Milestone 6: fencing tokens and idempotent assignments
+
+### What was built
+
+- **Every assignment row records the `epoch`** of the leader that wrote it.
+- **`FencedTransactions.run(epoch, work)`.** It starts each leader transaction with `SELECT epoch FROM leader_lease FOR SHARE`. If the epoch has moved on, it throws `StaleEpochException` and nothing is written.
+- **The scheduler's saves and the reconcile loop's "declare dead and requeue" writes are fenced.** When a write is rejected, the replica steps down immediately and logs a `FENCED:` line.
+- **Two timeouts.** PostgreSQL ends any session that sits idle inside a transaction for 2 s (`idle_in_transaction_session_timeout`). Lease writes give up after waiting 500 ms for a lock (`lock_timeout`).
+- **Worker side.** `EpochFence` remembers the highest epoch seen. `WorkerService` checks, in one synchronized step: epoch first, then node ID, then assignment ID dedupe. A `RESULT_STALE_EPOCH` reply makes the sending replica step down too.
+- **Tests.**
+  - `FencedTransactionsTest`: a replaced leader cannot write; an expired but not yet replaced leader can; a takeover waits for an in-flight fenced transaction to commit.
+  - `EpochFenceTest` and `WorkerServiceTest`: started, duplicate, stale epoch, wrong node, between registrations.
+  - A new `LeaderFailoverTest` case: after a real failover, a worker refuses an `AssignTask` carrying the old leader's epoch.
+
+### Why it is designed this way
+
+**Leases alone are not enough.** A lease says "you lead until time T", but a process cannot always tell what time it is. Here is the classic failure:
+
+1. The leader checks its lease. It is valid.
+2. The leader freezes: a long GC pause, `docker pause`, a VM migration.
+3. The lease expires, a standby takes over and starts epoch N+1, and it moves some work around.
+4. The old leader wakes up and finishes the write it had started, based on what it read before the pause.
+
+No amount of checking the clock fixes step 4, because the check in step 1 was correct when it happened. The fix (Kleppmann's fencing tokens) is to make whatever stores the write reject it. Every write carries the writer's term number, and storage refuses any term older than the newest it knows.
+
+**The epoch check and the write must be atomic.** A plain `SELECT epoch` followed by the writes would leave a gap: the takeover could commit between the check and the commit. `FOR SHARE` closes the gap. The lease row stays share-locked until the fenced transaction ends, and a takeover is an `UPDATE` of that row, which needs a conflicting lock. So the takeover waits. Terms therefore never overlap in the database. Every epoch-N write either commits before epoch N+1 starts (and the new leader sees it) or is rejected.
+
+**Safety depends on the epoch, never on the clock.** If the lease has expired but nobody has taken over, the old leader's fenced writes still succeed, and that is safe: no other term exists to conflict with. Time decides when a new leader may start (liveness). The epoch decides whose writes count (safety). The local deadline from milestone 5 is just there to avoid doing work that would be rejected.
+
+**Only decisions are fenced.** Placing tasks and declaring nodes dead are decisions; they depend on the leader's view of the world. Heartbeats, registrations and job submissions are facts reported from outside. They are true no matter who leads, so any replica records them without a fence, and they keep flowing during failover.
+
+**A frozen leader must not block a takeover forever.** If a leader freezes in the middle of a fenced transaction, it is holding the shared lock on the lease row. No standby could take over until it woke up. `idle_in_transaction_session_timeout = 2s` makes PostgreSQL end that session and release the lock. The 500 ms `lock_timeout` on lease writes means a standby's election thread gives up and retries on its next tick instead of hanging.
+
+**Workers check the epoch too.** Sending `AssignTask` is not a database write, so PostgreSQL cannot fence it. A leader can commit an assignment, freeze, and send it after a new leader has taken over. Once a worker has seen epoch N+1, it refuses anything from an older epoch. That is the "every resource checks the token" rule. The check, the node ID check and the start all happen under one lock. Otherwise an old-epoch request could pass the check a moment before a newer request raises the epoch, and start after it.
+
+**Assignments are idempotent by ID.** The same `AssignTask` can arrive several times: a retry after a timeout, a resend from the reconcile loop, or a new leader resending what the old one saved. The worker keeps every assignment ID it has accepted, so a repeat answers `RESULT_DUPLICATE` and starts nothing.
+
+**Defense in depth.** "A task is never placed on two nodes" rests on several independent layers. Any one of them alone would stop most mistakes:
+1. One decision thread per replica, so a leader never races itself.
+2. A job is claimed with `UPDATE ... WHERE state = 'PENDING'`, so it can only be claimed once.
+3. A unique index on active assignments per job, enforced by PostgreSQL no matter what the code does.
+4. Fenced transactions, so a replaced leader's decisions never commit.
+5. The worker epoch check, so a replaced leader's messages are refused.
+6. Worker dedupe by assignment ID, so repeated deliveries are harmless.
+7. The worker node ID check, so a reused IP address does not receive another node's task.
+
+### Tradeoffs
+
+- **Every leader write takes a shared lock on one row.** Shared locks do not block each other, but a lease renewal (an `UPDATE` of that row) waits for in-flight fenced transactions. Those last milliseconds, so renewals are not affected. With long transactions the lease could expire while waiting, which is a reason to keep leader transactions short.
+- **A worker only learns new epochs from `AssignTask`.** A worker that has not yet heard from the new leader would accept a delayed message from the old one. That message describes an assignment committed under a fence, so it was legitimate when sent. The worker check matters once the new leader has been in touch, which is when old messages could do harm.
+- **The idle timeout would also kill a legitimately slow client transaction.** No transaction here waits on anything between statements, so 2 s of silence only ever means the client is frozen.
+
+### Interview questions
+
+**Why are leases not enough for leader election on their own?**
+Because a leader can pause right after checking its lease and resume after another leader has taken over, without knowing any time passed. Its check was correct when it ran. Only the storage, at write time, can tell that a newer term exists, so every write carries the writer's epoch and storage rejects older ones.
+
+**Why `SELECT ... FOR SHARE` instead of a plain `SELECT` to check the epoch?**
+A plain read checks the epoch at one instant, and the takeover can commit right after it, before our writes commit. `FOR SHARE` holds a lock on the lease row until our transaction ends. The takeover's `UPDATE` must wait for it, so the check stays true until we commit.
+
+**If PostgreSQL already rejects writes from a stale leader, why do workers check epochs too?**
+The `AssignTask` RPC happens after the database transaction, outside it. A stale leader can commit while still current, freeze, and send the RPC much later. The worker is a separate resource, so it has to check the token itself.
