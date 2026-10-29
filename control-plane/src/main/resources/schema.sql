@@ -16,3 +16,21 @@ CREATE TABLE IF NOT EXISTS nodes (
     -- cannot make a node look dead.
     last_heartbeat_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Desired state: every job a client has submitted. A PENDING job is waiting
+-- in the queue, a SCHEDULED job has an active assignment, and a FINISHED job
+-- is done.
+CREATE TABLE IF NOT EXISTS jobs (
+    job_id          TEXT        PRIMARY KEY,
+    cpu_millis      BIGINT      NOT NULL CHECK (cpu_millis > 0),
+    memory_mb       BIGINT      NOT NULL CHECK (memory_mb > 0),
+    duration_millis BIGINT      NOT NULL CHECK (duration_millis >= 0),
+    state           TEXT        NOT NULL DEFAULT 'PENDING'
+                                CHECK (state IN ('PENDING', 'SCHEDULED', 'FINISHED')),
+    submitted_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    finished_at     TIMESTAMPTZ
+);
+
+-- The pending queue, oldest first. Partial, so finished jobs do not bloat it.
+CREATE INDEX IF NOT EXISTS pending_jobs_in_queue_order
+    ON jobs (submitted_at, job_id) WHERE state = 'PENDING';
