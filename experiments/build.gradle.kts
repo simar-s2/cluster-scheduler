@@ -52,3 +52,8 @@ registerExperiment(
     "nodeFailure",
     "clusterscheduler.experiments.NodeFailureExperiment",
     "Kill a worker and measure the time until all its tasks run on other nodes")
+
+registerExperiment(
+    "packing",
+    "clusterscheduler.experiments.PackingBenchmark",
+    "Submit 10,000 jobs to 100 nodes and measure CPU utilization")
