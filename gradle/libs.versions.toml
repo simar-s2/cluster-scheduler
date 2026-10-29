@@ -1,0 +1,15 @@
+# One place for every dependency version, shared by all modules.
+
+[versions]
+grpc = "1.85.1"
+# Must match the protobuf-java runtime that grpc-protobuf depends on.
+protobuf = "3.25.9"
+
+[libraries]
+grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
+grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
+protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
+protoc-gen-grpc-java = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
+
+[plugins]
+protobuf = { id = "com.google.protobuf", version = "0.10.0" }
