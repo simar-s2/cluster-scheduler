@@ -37,7 +37,7 @@ public final class WorkerNode implements AutoCloseable {
         ControlPlaneClient controlPlaneClient = new ControlPlaneClient(config.controlPlaneAddresses());
 
         Server grpcServer = ServerBuilder.forPort(config.grpcPort())
-                .addService(new WorkerService(taskRunner, identity))
+                .addService(new WorkerService(taskRunner, identity, new EpochFence()))
                 .build()
                 .start();
 
