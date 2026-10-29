@@ -1,5 +1,6 @@
 package clusterscheduler.controlplane.delivery;
 
+import clusterscheduler.controlplane.leadership.Leadership;
 import clusterscheduler.controlplane.state.Assignment;
 import clusterscheduler.proto.AssignTaskRequest;
 import clusterscheduler.proto.AssignTaskResponse;
@@ -23,9 +24,14 @@ public final class AssignmentSender implements AutoCloseable {
     private static final Logger log = LoggerFactory.getLogger(AssignmentSender.class);
     private static final long SEND_TIMEOUT_MILLIS = 2_000;
 
+    private final Leadership leadership;
     private final WorkerChannels workerChannels = new WorkerChannels();
     private final ExecutorService senderThreads =
             Executors.newFixedThreadPool(16, runnable -> new Thread(runnable, "assignment-sender"));
+
+    public AssignmentSender(Leadership leadership) {
+        this.leadership = leadership;
+    }
 
     /** Sends each assignment, stamped with the epoch of the leader sending it. */
     public void sendAll(List<Assignment> assignments, long leaderEpoch) {
@@ -54,8 +60,19 @@ public final class AssignmentSender implements AutoCloseable {
             AssignTaskResponse response = workerChannels.stubFor(assignment.nodeId(), assignment.nodeAddress())
                     .withDeadlineAfter(SEND_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
                     .assignTask(request);
-            if (response.getResult() == AssignTaskResponse.Result.RESULT_WRONG_NODE) {
-                log.warn("Address {} no longer belongs to node {}", assignment.nodeAddress(), assignment.nodeId());
+            switch (response.getResult()) {
+                case RESULT_STALE_EPOCH -> {
+                    // The worker has heard from a newer leader, so this replica
+                    // has been replaced even if its lease has not caught up yet.
+                    log.warn("FENCED: worker {} rejected epoch {}; stepping down",
+                            assignment.nodeId(), leaderEpoch);
+                    leadership.stepDown(leaderEpoch);
+                }
+                case RESULT_WRONG_NODE -> log.warn("Address {} no longer belongs to node {}",
+                        assignment.nodeAddress(), assignment.nodeId());
+                default -> {
+                    // Started, or already running there. Either way it is delivered.
+                }
             }
         } catch (StatusRuntimeException failure) {
             log.debug("Could not send assignment {} to node {}: {}",

@@ -59,13 +59,13 @@ public final class ControlPlane implements AutoCloseable {
         HeartbeatRepository heartbeatRepository = new HeartbeatRepository(database);
         JobRepository jobRepository = new JobRepository(database);
         AssignmentRepository assignmentRepository = new AssignmentRepository();
-        AssignmentSender assignmentSender = new AssignmentSender();
+        Leadership leadership = new Leadership();
+        AssignmentSender assignmentSender = new AssignmentSender(leadership);
 
         Server grpcServer = ServerBuilder.forPort(config.grpcPort())
                 .addService(new ControlPlaneService(nodeRepository, heartbeatRepository, jobRepository))
                 .build()
                 .start();
-        Leadership leadership = new Leadership();
         LeaderElector leaderElector = new LeaderElector(
                 config.replicaId(), new LeaseRepository(database), leadership,
                 config.leaseDurationMillis(), config.leaseRenewIntervalMillis());
