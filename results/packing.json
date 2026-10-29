@@ -1,0 +1,3784 @@
+{
+  "experiment" : "packing",
+  "finishedAt" : "2026-10-29T22:20:59.718164Z",
+  "config" : {
+    "workerContainers" : 100,
+    "nodesPerContainer" : 1,
+    "nodes" : 100,
+    "nodeCpuMillis" : 4000,
+    "nodeMemoryMb" : 8192,
+    "jobs" : 10000,
+    "jobCpuMillis" : "250 to 2000 in steps of 250, uniform",
+    "jobMemoryMb" : "256 to 4096 in steps of 256, uniform",
+    "jobDuration" : "5 to 20 seconds, uniform",
+    "seed" : 1,
+    "utilizationDefinition" : "allocated CPU / total CPU capacity of live nodes, sampled every second while at least one job was pending"
+  },
+  "samplesWhileJobsWereWaiting" : 351,
+  "cpuUtilizationWhileJobsWereWaiting" : {
+    "count" : 351,
+    "min" : 0.90375,
+    "median" : 0.97875,
+    "p99" : 0.9975,
+    "max" : 0.99875,
+    "mean" : 0.9753240740740741
+  },
+  "memoryUtilizationWhileJobsWereWaiting" : {
+    "count" : 351,
+    "min" : 0.7575,
+    "median" : 0.929375,
+    "p99" : 0.9590625,
+    "max" : 0.9625,
+    "mean" : 0.923218482905983
+  },
+  "workerReportedCpuUtilizationWhileJobsWereWaiting" : {
+    "count" : 351,
+    "min" : 0.86625,
+    "median" : 0.910625,
+    "p99" : 0.951875,
+    "max" : 0.960625,
+    "mean" : 0.9104202279202279
+  },
+  "secondsUntilAllJobsFinished" : 388.169013833,
+  "jobsFinishedPerSecond" : 25.761973891873424,
+  "secondsEachJobWaitedForPlacement" : {
+    "count" : 10000,
+    "min" : 0.011679,
+    "median" : 173.120677,
+    "p99" : 354.077893,
+    "max" : 359.010665,
+    "mean" : 173.0898425985
+  },
+  "meanSchedulingPassMillis" : 5.360564811243811,
+  "workerContainerMemoryMib" : {
+    "count" : 100,
+    "min" : 32.38,
+    "median" : 41.3,
+    "p99" : 46.13,
+    "max" : 46.14,
+    "mean" : 41.4471
+  },
+  "nodesDeclaredDead" : 0,
+  "jobsWithOverlappingActiveAssignmentsInDatabase" : 0,
+  "samples" : [ {
+    "secondsSinceStart" : 8.97700325,
+    "pendingJobs" : 9621,
+    "activeAssignments" : 364,
+    "finishedJobs" : 15,
+    "allocatedCpuMillis" : 388500,
+    "allocatedMemoryMb" : 750592,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 384250
+  }, {
+    "secondsSinceStart" : 9.994030125,
+    "pendingJobs" : 9609,
+    "activeAssignments" : 366,
+    "finishedJobs" : 25,
+    "allocatedCpuMillis" : 388750,
+    "allocatedMemoryMb" : 752384,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 381250
+  }, {
+    "secondsSinceStart" : 11.002634875,
+    "pendingJobs" : 9581,
+    "activeAssignments" : 369,
+    "finishedJobs" : 50,
+    "allocatedCpuMillis" : 385500,
+    "allocatedMemoryMb" : 742656,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366750
+  }, {
+    "secondsSinceStart" : 12.016154125,
+    "pendingJobs" : 9537,
+    "activeAssignments" : 375,
+    "finishedJobs" : 88,
+    "allocatedCpuMillis" : 382500,
+    "allocatedMemoryMb" : 732928,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 346500
+  }, {
+    "secondsSinceStart" : 13.027352041,
+    "pendingJobs" : 9502,
+    "activeAssignments" : 383,
+    "finishedJobs" : 115,
+    "allocatedCpuMillis" : 388500,
+    "allocatedMemoryMb" : 753152,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365250
+  }, {
+    "secondsSinceStart" : 14.037984,
+    "pendingJobs" : 9467,
+    "activeAssignments" : 389,
+    "finishedJobs" : 144,
+    "allocatedCpuMillis" : 392500,
+    "allocatedMemoryMb" : 766208,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357000
+  }, {
+    "secondsSinceStart" : 15.04508725,
+    "pendingJobs" : 9441,
+    "activeAssignments" : 394,
+    "finishedJobs" : 165,
+    "allocatedCpuMillis" : 392250,
+    "allocatedMemoryMb" : 763904,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369500
+  }, {
+    "secondsSinceStart" : 16.057583166,
+    "pendingJobs" : 9421,
+    "activeAssignments" : 388,
+    "finishedJobs" : 191,
+    "allocatedCpuMillis" : 389500,
+    "allocatedMemoryMb" : 747776,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371000
+  }, {
+    "secondsSinceStart" : 17.066822833,
+    "pendingJobs" : 9399,
+    "activeAssignments" : 390,
+    "finishedJobs" : 211,
+    "allocatedCpuMillis" : 386250,
+    "allocatedMemoryMb" : 756736,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371500
+  }, {
+    "secondsSinceStart" : 18.100027083,
+    "pendingJobs" : 9371,
+    "activeAssignments" : 393,
+    "finishedJobs" : 236,
+    "allocatedCpuMillis" : 391250,
+    "allocatedMemoryMb" : 772096,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363750
+  }, {
+    "secondsSinceStart" : 19.116777291,
+    "pendingJobs" : 9332,
+    "activeAssignments" : 389,
+    "finishedJobs" : 279,
+    "allocatedCpuMillis" : 389500,
+    "allocatedMemoryMb" : 772352,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 353750
+  }, {
+    "secondsSinceStart" : 20.129864166,
+    "pendingJobs" : 9297,
+    "activeAssignments" : 387,
+    "finishedJobs" : 316,
+    "allocatedCpuMillis" : 391750,
+    "allocatedMemoryMb" : 774400,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357750
+  }, {
+    "secondsSinceStart" : 21.140964375,
+    "pendingJobs" : 9267,
+    "activeAssignments" : 385,
+    "finishedJobs" : 348,
+    "allocatedCpuMillis" : 392000,
+    "allocatedMemoryMb" : 775936,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362250
+  }, {
+    "secondsSinceStart" : 22.149268125,
+    "pendingJobs" : 9238,
+    "activeAssignments" : 377,
+    "finishedJobs" : 385,
+    "allocatedCpuMillis" : 383000,
+    "allocatedMemoryMb" : 760320,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 354750
+  }, {
+    "secondsSinceStart" : 23.1550405,
+    "pendingJobs" : 9208,
+    "activeAssignments" : 382,
+    "finishedJobs" : 410,
+    "allocatedCpuMillis" : 390750,
+    "allocatedMemoryMb" : 777984,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 355750
+  }, {
+    "secondsSinceStart" : 24.161781166,
+    "pendingJobs" : 9184,
+    "activeAssignments" : 378,
+    "finishedJobs" : 438,
+    "allocatedCpuMillis" : 391500,
+    "allocatedMemoryMb" : 768512,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370500
+  }, {
+    "secondsSinceStart" : 25.17045475,
+    "pendingJobs" : 9157,
+    "activeAssignments" : 373,
+    "finishedJobs" : 470,
+    "allocatedCpuMillis" : 392750,
+    "allocatedMemoryMb" : 766976,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363750
+  }, {
+    "secondsSinceStart" : 26.179341875,
+    "pendingJobs" : 9131,
+    "activeAssignments" : 372,
+    "finishedJobs" : 497,
+    "allocatedCpuMillis" : 393000,
+    "allocatedMemoryMb" : 769024,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366750
+  }, {
+    "secondsSinceStart" : 27.187807208,
+    "pendingJobs" : 9113,
+    "activeAssignments" : 368,
+    "finishedJobs" : 519,
+    "allocatedCpuMillis" : 390000,
+    "allocatedMemoryMb" : 760064,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368000
+  }, {
+    "secondsSinceStart" : 28.198043541,
+    "pendingJobs" : 9079,
+    "activeAssignments" : 370,
+    "finishedJobs" : 551,
+    "allocatedCpuMillis" : 392750,
+    "allocatedMemoryMb" : 768256,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361000
+  }, {
+    "secondsSinceStart" : 29.205484666,
+    "pendingJobs" : 9044,
+    "activeAssignments" : 371,
+    "finishedJobs" : 585,
+    "allocatedCpuMillis" : 393000,
+    "allocatedMemoryMb" : 771328,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 355750
+  }, {
+    "secondsSinceStart" : 30.213579708,
+    "pendingJobs" : 9011,
+    "activeAssignments" : 371,
+    "finishedJobs" : 618,
+    "allocatedCpuMillis" : 393000,
+    "allocatedMemoryMb" : 772352,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358000
+  }, {
+    "secondsSinceStart" : 31.228030083,
+    "pendingJobs" : 8973,
+    "activeAssignments" : 376,
+    "finishedJobs" : 651,
+    "allocatedCpuMillis" : 393500,
+    "allocatedMemoryMb" : 781312,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357500
+  }, {
+    "secondsSinceStart" : 32.234026416,
+    "pendingJobs" : 8948,
+    "activeAssignments" : 377,
+    "finishedJobs" : 675,
+    "allocatedCpuMillis" : 393000,
+    "allocatedMemoryMb" : 778240,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364000
+  }, {
+    "secondsSinceStart" : 33.24947325,
+    "pendingJobs" : 8920,
+    "activeAssignments" : 377,
+    "finishedJobs" : 703,
+    "allocatedCpuMillis" : 394750,
+    "allocatedMemoryMb" : 767744,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362500
+  }, {
+    "secondsSinceStart" : 34.261008291,
+    "pendingJobs" : 8894,
+    "activeAssignments" : 374,
+    "finishedJobs" : 732,
+    "allocatedCpuMillis" : 393500,
+    "allocatedMemoryMb" : 768000,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371500
+  }, {
+    "secondsSinceStart" : 35.268483916,
+    "pendingJobs" : 8867,
+    "activeAssignments" : 375,
+    "finishedJobs" : 758,
+    "allocatedCpuMillis" : 394250,
+    "allocatedMemoryMb" : 768256,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365500
+  }, {
+    "secondsSinceStart" : 36.281593833,
+    "pendingJobs" : 8838,
+    "activeAssignments" : 376,
+    "finishedJobs" : 786,
+    "allocatedCpuMillis" : 396750,
+    "allocatedMemoryMb" : 766208,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369000
+  }, {
+    "secondsSinceStart" : 37.289920125,
+    "pendingJobs" : 8803,
+    "activeAssignments" : 380,
+    "finishedJobs" : 817,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 778240,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 353750
+  }, {
+    "secondsSinceStart" : 38.297308916,
+    "pendingJobs" : 8777,
+    "activeAssignments" : 380,
+    "finishedJobs" : 843,
+    "allocatedCpuMillis" : 396500,
+    "allocatedMemoryMb" : 780032,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364500
+  }, {
+    "secondsSinceStart" : 43.736785833,
+    "pendingJobs" : 8620,
+    "activeAssignments" : 374,
+    "finishedJobs" : 1006,
+    "allocatedCpuMillis" : 390250,
+    "allocatedMemoryMb" : 778240,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357500
+  }, {
+    "secondsSinceStart" : 44.743231333,
+    "pendingJobs" : 8598,
+    "activeAssignments" : 368,
+    "finishedJobs" : 1034,
+    "allocatedCpuMillis" : 383750,
+    "allocatedMemoryMb" : 761856,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359000
+  }, {
+    "secondsSinceStart" : 45.75120875,
+    "pendingJobs" : 8568,
+    "activeAssignments" : 374,
+    "finishedJobs" : 1058,
+    "allocatedCpuMillis" : 389000,
+    "allocatedMemoryMb" : 776448,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370000
+  }, {
+    "secondsSinceStart" : 46.767751125,
+    "pendingJobs" : 8531,
+    "activeAssignments" : 377,
+    "finishedJobs" : 1092,
+    "allocatedCpuMillis" : 393500,
+    "allocatedMemoryMb" : 788480,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362750
+  }, {
+    "secondsSinceStart" : 47.773374,
+    "pendingJobs" : 8516,
+    "activeAssignments" : 366,
+    "finishedJobs" : 1118,
+    "allocatedCpuMillis" : 384000,
+    "allocatedMemoryMb" : 777984,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369750
+  }, {
+    "secondsSinceStart" : 48.785145125,
+    "pendingJobs" : 8482,
+    "activeAssignments" : 368,
+    "finishedJobs" : 1150,
+    "allocatedCpuMillis" : 392250,
+    "allocatedMemoryMb" : 779520,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359750
+  }, {
+    "secondsSinceStart" : 49.799309166,
+    "pendingJobs" : 8457,
+    "activeAssignments" : 365,
+    "finishedJobs" : 1178,
+    "allocatedCpuMillis" : 388750,
+    "allocatedMemoryMb" : 765184,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369000
+  }, {
+    "secondsSinceStart" : 50.809094791,
+    "pendingJobs" : 8432,
+    "activeAssignments" : 367,
+    "finishedJobs" : 1201,
+    "allocatedCpuMillis" : 389750,
+    "allocatedMemoryMb" : 767488,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368250
+  }, {
+    "secondsSinceStart" : 51.816674791,
+    "pendingJobs" : 8397,
+    "activeAssignments" : 363,
+    "finishedJobs" : 1240,
+    "allocatedCpuMillis" : 387250,
+    "allocatedMemoryMb" : 772864,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 351500
+  }, {
+    "secondsSinceStart" : 52.824280708,
+    "pendingJobs" : 8360,
+    "activeAssignments" : 367,
+    "finishedJobs" : 1273,
+    "allocatedCpuMillis" : 392000,
+    "allocatedMemoryMb" : 785920,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364500
+  }, {
+    "secondsSinceStart" : 53.833647791,
+    "pendingJobs" : 8342,
+    "activeAssignments" : 367,
+    "finishedJobs" : 1291,
+    "allocatedCpuMillis" : 390500,
+    "allocatedMemoryMb" : 785664,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 372000
+  }, {
+    "secondsSinceStart" : 54.8485535,
+    "pendingJobs" : 8320,
+    "activeAssignments" : 360,
+    "finishedJobs" : 1320,
+    "allocatedCpuMillis" : 385750,
+    "allocatedMemoryMb" : 774912,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362750
+  }, {
+    "secondsSinceStart" : 55.859362166,
+    "pendingJobs" : 8282,
+    "activeAssignments" : 363,
+    "finishedJobs" : 1355,
+    "allocatedCpuMillis" : 388250,
+    "allocatedMemoryMb" : 777984,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 355250
+  }, {
+    "secondsSinceStart" : 56.8760855,
+    "pendingJobs" : 8256,
+    "activeAssignments" : 364,
+    "finishedJobs" : 1380,
+    "allocatedCpuMillis" : 392000,
+    "allocatedMemoryMb" : 784640,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367500
+  }, {
+    "secondsSinceStart" : 57.885429916,
+    "pendingJobs" : 8227,
+    "activeAssignments" : 360,
+    "finishedJobs" : 1413,
+    "allocatedCpuMillis" : 389000,
+    "allocatedMemoryMb" : 776704,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 354750
+  }, {
+    "secondsSinceStart" : 58.89671225,
+    "pendingJobs" : 8206,
+    "activeAssignments" : 350,
+    "finishedJobs" : 1444,
+    "allocatedCpuMillis" : 380250,
+    "allocatedMemoryMb" : 750080,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359000
+  }, {
+    "secondsSinceStart" : 59.907308,
+    "pendingJobs" : 8160,
+    "activeAssignments" : 364,
+    "finishedJobs" : 1476,
+    "allocatedCpuMillis" : 394500,
+    "allocatedMemoryMb" : 775680,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 356000
+  }, {
+    "secondsSinceStart" : 60.915201041,
+    "pendingJobs" : 8135,
+    "activeAssignments" : 360,
+    "finishedJobs" : 1505,
+    "allocatedCpuMillis" : 393750,
+    "allocatedMemoryMb" : 773888,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369500
+  }, {
+    "secondsSinceStart" : 61.921756875,
+    "pendingJobs" : 8108,
+    "activeAssignments" : 357,
+    "finishedJobs" : 1535,
+    "allocatedCpuMillis" : 391000,
+    "allocatedMemoryMb" : 779008,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363500
+  }, {
+    "secondsSinceStart" : 62.927207583,
+    "pendingJobs" : 8091,
+    "activeAssignments" : 354,
+    "finishedJobs" : 1555,
+    "allocatedCpuMillis" : 389750,
+    "allocatedMemoryMb" : 780288,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370250
+  }, {
+    "secondsSinceStart" : 63.939313125,
+    "pendingJobs" : 8071,
+    "activeAssignments" : 349,
+    "finishedJobs" : 1580,
+    "allocatedCpuMillis" : 384750,
+    "allocatedMemoryMb" : 773120,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357750
+  }, {
+    "secondsSinceStart" : 64.954079375,
+    "pendingJobs" : 8035,
+    "activeAssignments" : 347,
+    "finishedJobs" : 1618,
+    "allocatedCpuMillis" : 389750,
+    "allocatedMemoryMb" : 779776,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 347750
+  }, {
+    "secondsSinceStart" : 65.962234458,
+    "pendingJobs" : 8017,
+    "activeAssignments" : 345,
+    "finishedJobs" : 1638,
+    "allocatedCpuMillis" : 388500,
+    "allocatedMemoryMb" : 777216,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367000
+  }, {
+    "secondsSinceStart" : 66.969960916,
+    "pendingJobs" : 7977,
+    "activeAssignments" : 348,
+    "finishedJobs" : 1675,
+    "allocatedCpuMillis" : 391000,
+    "allocatedMemoryMb" : 780288,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 352250
+  }, {
+    "secondsSinceStart" : 67.982865625,
+    "pendingJobs" : 7949,
+    "activeAssignments" : 349,
+    "finishedJobs" : 1702,
+    "allocatedCpuMillis" : 390500,
+    "allocatedMemoryMb" : 780288,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369500
+  }, {
+    "secondsSinceStart" : 68.992197875,
+    "pendingJobs" : 7917,
+    "activeAssignments" : 351,
+    "finishedJobs" : 1732,
+    "allocatedCpuMillis" : 391750,
+    "allocatedMemoryMb" : 781568,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361250
+  }, {
+    "secondsSinceStart" : 70.000159333,
+    "pendingJobs" : 7895,
+    "activeAssignments" : 351,
+    "finishedJobs" : 1754,
+    "allocatedCpuMillis" : 391500,
+    "allocatedMemoryMb" : 779264,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369250
+  }, {
+    "secondsSinceStart" : 71.009936333,
+    "pendingJobs" : 7878,
+    "activeAssignments" : 350,
+    "finishedJobs" : 1772,
+    "allocatedCpuMillis" : 389250,
+    "allocatedMemoryMb" : 775168,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 374250
+  }, {
+    "secondsSinceStart" : 72.023818666,
+    "pendingJobs" : 7857,
+    "activeAssignments" : 348,
+    "finishedJobs" : 1795,
+    "allocatedCpuMillis" : 390250,
+    "allocatedMemoryMb" : 764672,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368750
+  }, {
+    "secondsSinceStart" : 73.037642083,
+    "pendingJobs" : 7830,
+    "activeAssignments" : 353,
+    "finishedJobs" : 1817,
+    "allocatedCpuMillis" : 392750,
+    "allocatedMemoryMb" : 779520,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 372500
+  }, {
+    "secondsSinceStart" : 74.046521333,
+    "pendingJobs" : 7799,
+    "activeAssignments" : 354,
+    "finishedJobs" : 1847,
+    "allocatedCpuMillis" : 390250,
+    "allocatedMemoryMb" : 772608,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357750
+  }, {
+    "secondsSinceStart" : 75.057169916,
+    "pendingJobs" : 7775,
+    "activeAssignments" : 357,
+    "finishedJobs" : 1868,
+    "allocatedCpuMillis" : 393250,
+    "allocatedMemoryMb" : 771840,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365750
+  }, {
+    "secondsSinceStart" : 76.064901416,
+    "pendingJobs" : 7742,
+    "activeAssignments" : 351,
+    "finishedJobs" : 1907,
+    "allocatedCpuMillis" : 390000,
+    "allocatedMemoryMb" : 765184,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 347500
+  }, {
+    "secondsSinceStart" : 77.0804675,
+    "pendingJobs" : 7715,
+    "activeAssignments" : 354,
+    "finishedJobs" : 1931,
+    "allocatedCpuMillis" : 392250,
+    "allocatedMemoryMb" : 769280,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364750
+  }, {
+    "secondsSinceStart" : 78.095796583,
+    "pendingJobs" : 7683,
+    "activeAssignments" : 352,
+    "finishedJobs" : 1965,
+    "allocatedCpuMillis" : 387500,
+    "allocatedMemoryMb" : 757248,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 351500
+  }, {
+    "secondsSinceStart" : 79.111775791,
+    "pendingJobs" : 7655,
+    "activeAssignments" : 355,
+    "finishedJobs" : 1990,
+    "allocatedCpuMillis" : 393000,
+    "allocatedMemoryMb" : 774912,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366000
+  }, {
+    "secondsSinceStart" : 80.121931,
+    "pendingJobs" : 7631,
+    "activeAssignments" : 351,
+    "finishedJobs" : 2018,
+    "allocatedCpuMillis" : 392750,
+    "allocatedMemoryMb" : 771840,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361250
+  }, {
+    "secondsSinceStart" : 81.13504875,
+    "pendingJobs" : 7610,
+    "activeAssignments" : 348,
+    "finishedJobs" : 2042,
+    "allocatedCpuMillis" : 389250,
+    "allocatedMemoryMb" : 764416,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366250
+  }, {
+    "secondsSinceStart" : 82.147589333,
+    "pendingJobs" : 7585,
+    "activeAssignments" : 349,
+    "finishedJobs" : 2066,
+    "allocatedCpuMillis" : 391250,
+    "allocatedMemoryMb" : 771072,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368500
+  }, {
+    "secondsSinceStart" : 83.163189125,
+    "pendingJobs" : 7562,
+    "activeAssignments" : 350,
+    "finishedJobs" : 2088,
+    "allocatedCpuMillis" : 389750,
+    "allocatedMemoryMb" : 763392,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367250
+  }, {
+    "secondsSinceStart" : 84.178738,
+    "pendingJobs" : 7525,
+    "activeAssignments" : 347,
+    "finishedJobs" : 2128,
+    "allocatedCpuMillis" : 388750,
+    "allocatedMemoryMb" : 764928,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 350000
+  }, {
+    "secondsSinceStart" : 85.191256541,
+    "pendingJobs" : 7492,
+    "activeAssignments" : 347,
+    "finishedJobs" : 2161,
+    "allocatedCpuMillis" : 389250,
+    "allocatedMemoryMb" : 759296,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 356500
+  }, {
+    "secondsSinceStart" : 86.201801666,
+    "pendingJobs" : 7468,
+    "activeAssignments" : 346,
+    "finishedJobs" : 2186,
+    "allocatedCpuMillis" : 390500,
+    "allocatedMemoryMb" : 762368,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368250
+  }, {
+    "secondsSinceStart" : 87.215571375,
+    "pendingJobs" : 7432,
+    "activeAssignments" : 351,
+    "finishedJobs" : 2217,
+    "allocatedCpuMillis" : 394750,
+    "allocatedMemoryMb" : 772352,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359000
+  }, {
+    "secondsSinceStart" : 88.230166958,
+    "pendingJobs" : 7402,
+    "activeAssignments" : 350,
+    "finishedJobs" : 2248,
+    "allocatedCpuMillis" : 394250,
+    "allocatedMemoryMb" : 776704,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362250
+  }, {
+    "secondsSinceStart" : 89.245803,
+    "pendingJobs" : 7381,
+    "activeAssignments" : 346,
+    "finishedJobs" : 2273,
+    "allocatedCpuMillis" : 390250,
+    "allocatedMemoryMb" : 764160,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366000
+  }, {
+    "secondsSinceStart" : 90.25734275,
+    "pendingJobs" : 7360,
+    "activeAssignments" : 348,
+    "finishedJobs" : 2292,
+    "allocatedCpuMillis" : 393500,
+    "allocatedMemoryMb" : 767488,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371000
+  }, {
+    "secondsSinceStart" : 91.271476416,
+    "pendingJobs" : 7341,
+    "activeAssignments" : 347,
+    "finishedJobs" : 2312,
+    "allocatedCpuMillis" : 393500,
+    "allocatedMemoryMb" : 772096,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 374750
+  }, {
+    "secondsSinceStart" : 92.283663666,
+    "pendingJobs" : 7318,
+    "activeAssignments" : 348,
+    "finishedJobs" : 2334,
+    "allocatedCpuMillis" : 391000,
+    "allocatedMemoryMb" : 770560,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364000
+  }, {
+    "secondsSinceStart" : 93.299427833,
+    "pendingJobs" : 7290,
+    "activeAssignments" : 350,
+    "finishedJobs" : 2360,
+    "allocatedCpuMillis" : 392750,
+    "allocatedMemoryMb" : 772096,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363500
+  }, {
+    "secondsSinceStart" : 94.314689583,
+    "pendingJobs" : 7259,
+    "activeAssignments" : 355,
+    "finishedJobs" : 2386,
+    "allocatedCpuMillis" : 394500,
+    "allocatedMemoryMb" : 771840,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366250
+  }, {
+    "secondsSinceStart" : 95.330589875,
+    "pendingJobs" : 7229,
+    "activeAssignments" : 358,
+    "finishedJobs" : 2413,
+    "allocatedCpuMillis" : 394750,
+    "allocatedMemoryMb" : 770816,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365000
+  }, {
+    "secondsSinceStart" : 96.345262333,
+    "pendingJobs" : 7195,
+    "activeAssignments" : 357,
+    "finishedJobs" : 2448,
+    "allocatedCpuMillis" : 394750,
+    "allocatedMemoryMb" : 771072,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359000
+  }, {
+    "secondsSinceStart" : 97.360422166,
+    "pendingJobs" : 7158,
+    "activeAssignments" : 361,
+    "finishedJobs" : 2481,
+    "allocatedCpuMillis" : 394000,
+    "allocatedMemoryMb" : 767232,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 355500
+  }, {
+    "secondsSinceStart" : 98.367469125,
+    "pendingJobs" : 7120,
+    "activeAssignments" : 366,
+    "finishedJobs" : 2514,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 773632,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361500
+  }, {
+    "secondsSinceStart" : 99.377053333,
+    "pendingJobs" : 7096,
+    "activeAssignments" : 365,
+    "finishedJobs" : 2539,
+    "allocatedCpuMillis" : 394750,
+    "allocatedMemoryMb" : 775424,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367250
+  }, {
+    "secondsSinceStart" : 100.390871625,
+    "pendingJobs" : 7065,
+    "activeAssignments" : 368,
+    "finishedJobs" : 2567,
+    "allocatedCpuMillis" : 396000,
+    "allocatedMemoryMb" : 777984,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364250
+  }, {
+    "secondsSinceStart" : 101.4076515,
+    "pendingJobs" : 7034,
+    "activeAssignments" : 363,
+    "finishedJobs" : 2603,
+    "allocatedCpuMillis" : 391750,
+    "allocatedMemoryMb" : 769792,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 356750
+  }, {
+    "secondsSinceStart" : 102.422494291,
+    "pendingJobs" : 7006,
+    "activeAssignments" : 366,
+    "finishedJobs" : 2628,
+    "allocatedCpuMillis" : 393250,
+    "allocatedMemoryMb" : 777984,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365750
+  }, {
+    "secondsSinceStart" : 103.434064916,
+    "pendingJobs" : 6985,
+    "activeAssignments" : 361,
+    "finishedJobs" : 2654,
+    "allocatedCpuMillis" : 388000,
+    "allocatedMemoryMb" : 765184,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367750
+  }, {
+    "secondsSinceStart" : 104.448424916,
+    "pendingJobs" : 6954,
+    "activeAssignments" : 362,
+    "finishedJobs" : 2684,
+    "allocatedCpuMillis" : 389750,
+    "allocatedMemoryMb" : 775936,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365500
+  }, {
+    "secondsSinceStart" : 105.46178425,
+    "pendingJobs" : 6926,
+    "activeAssignments" : 351,
+    "finishedJobs" : 2723,
+    "allocatedCpuMillis" : 381500,
+    "allocatedMemoryMb" : 772096,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 351250
+  }, {
+    "secondsSinceStart" : 106.476750083,
+    "pendingJobs" : 6901,
+    "activeAssignments" : 351,
+    "finishedJobs" : 2748,
+    "allocatedCpuMillis" : 387750,
+    "allocatedMemoryMb" : 778752,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368000
+  }, {
+    "secondsSinceStart" : 107.486158833,
+    "pendingJobs" : 6874,
+    "activeAssignments" : 349,
+    "finishedJobs" : 2777,
+    "allocatedCpuMillis" : 388750,
+    "allocatedMemoryMb" : 769280,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364000
+  }, {
+    "secondsSinceStart" : 108.499073666,
+    "pendingJobs" : 6844,
+    "activeAssignments" : 351,
+    "finishedJobs" : 2805,
+    "allocatedCpuMillis" : 390000,
+    "allocatedMemoryMb" : 775168,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363500
+  }, {
+    "secondsSinceStart" : 109.508670333,
+    "pendingJobs" : 6816,
+    "activeAssignments" : 354,
+    "finishedJobs" : 2830,
+    "allocatedCpuMillis" : 392500,
+    "allocatedMemoryMb" : 778752,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366000
+  }, {
+    "secondsSinceStart" : 110.524665125,
+    "pendingJobs" : 6786,
+    "activeAssignments" : 349,
+    "finishedJobs" : 2865,
+    "allocatedCpuMillis" : 389000,
+    "allocatedMemoryMb" : 776960,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358500
+  }, {
+    "secondsSinceStart" : 111.531228791,
+    "pendingJobs" : 6767,
+    "activeAssignments" : 344,
+    "finishedJobs" : 2889,
+    "allocatedCpuMillis" : 388500,
+    "allocatedMemoryMb" : 768768,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371500
+  }, {
+    "secondsSinceStart" : 112.544562833,
+    "pendingJobs" : 6730,
+    "activeAssignments" : 347,
+    "finishedJobs" : 2923,
+    "allocatedCpuMillis" : 390500,
+    "allocatedMemoryMb" : 768768,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 356500
+  }, {
+    "secondsSinceStart" : 113.553006291,
+    "pendingJobs" : 6703,
+    "activeAssignments" : 351,
+    "finishedJobs" : 2946,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 774656,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369500
+  }, {
+    "secondsSinceStart" : 114.56441825,
+    "pendingJobs" : 6683,
+    "activeAssignments" : 350,
+    "finishedJobs" : 2967,
+    "allocatedCpuMillis" : 396500,
+    "allocatedMemoryMb" : 777728,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370750
+  }, {
+    "secondsSinceStart" : 115.578428833,
+    "pendingJobs" : 6655,
+    "activeAssignments" : 350,
+    "finishedJobs" : 2995,
+    "allocatedCpuMillis" : 397750,
+    "allocatedMemoryMb" : 775680,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363250
+  }, {
+    "secondsSinceStart" : 116.584715375,
+    "pendingJobs" : 6636,
+    "activeAssignments" : 345,
+    "finishedJobs" : 3019,
+    "allocatedCpuMillis" : 392500,
+    "allocatedMemoryMb" : 763392,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368250
+  }, {
+    "secondsSinceStart" : 117.595652125,
+    "pendingJobs" : 6602,
+    "activeAssignments" : 351,
+    "finishedJobs" : 3047,
+    "allocatedCpuMillis" : 398000,
+    "allocatedMemoryMb" : 774912,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364750
+  }, {
+    "secondsSinceStart" : 118.604499125,
+    "pendingJobs" : 6579,
+    "activeAssignments" : 349,
+    "finishedJobs" : 3072,
+    "allocatedCpuMillis" : 397000,
+    "allocatedMemoryMb" : 774912,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370000
+  }, {
+    "secondsSinceStart" : 119.610232208,
+    "pendingJobs" : 6549,
+    "activeAssignments" : 346,
+    "finishedJobs" : 3105,
+    "allocatedCpuMillis" : 389750,
+    "allocatedMemoryMb" : 760320,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 356750
+  }, {
+    "secondsSinceStart" : 120.626284416,
+    "pendingJobs" : 6518,
+    "activeAssignments" : 352,
+    "finishedJobs" : 3130,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 773120,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 373250
+  }, {
+    "secondsSinceStart" : 121.633666375,
+    "pendingJobs" : 6496,
+    "activeAssignments" : 349,
+    "finishedJobs" : 3155,
+    "allocatedCpuMillis" : 395750,
+    "allocatedMemoryMb" : 768256,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 373000
+  }, {
+    "secondsSinceStart" : 122.6444455,
+    "pendingJobs" : 6468,
+    "activeAssignments" : 351,
+    "finishedJobs" : 3181,
+    "allocatedCpuMillis" : 398250,
+    "allocatedMemoryMb" : 769792,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368250
+  }, {
+    "secondsSinceStart" : 123.65389325,
+    "pendingJobs" : 6439,
+    "activeAssignments" : 349,
+    "finishedJobs" : 3212,
+    "allocatedCpuMillis" : 398500,
+    "allocatedMemoryMb" : 761600,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362250
+  }, {
+    "secondsSinceStart" : 124.666958833,
+    "pendingJobs" : 6411,
+    "activeAssignments" : 350,
+    "finishedJobs" : 3239,
+    "allocatedCpuMillis" : 399000,
+    "allocatedMemoryMb" : 756224,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371500
+  }, {
+    "secondsSinceStart" : 125.676890416,
+    "pendingJobs" : 6382,
+    "activeAssignments" : 348,
+    "finishedJobs" : 3270,
+    "allocatedCpuMillis" : 398750,
+    "allocatedMemoryMb" : 759296,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361500
+  }, {
+    "secondsSinceStart" : 126.684938166,
+    "pendingJobs" : 6362,
+    "activeAssignments" : 345,
+    "finishedJobs" : 3293,
+    "allocatedCpuMillis" : 395250,
+    "allocatedMemoryMb" : 748800,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371000
+  }, {
+    "secondsSinceStart" : 127.701260125,
+    "pendingJobs" : 6335,
+    "activeAssignments" : 345,
+    "finishedJobs" : 3320,
+    "allocatedCpuMillis" : 397000,
+    "allocatedMemoryMb" : 758784,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 373500
+  }, {
+    "secondsSinceStart" : 128.711771125,
+    "pendingJobs" : 6304,
+    "activeAssignments" : 344,
+    "finishedJobs" : 3352,
+    "allocatedCpuMillis" : 397500,
+    "allocatedMemoryMb" : 754944,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360250
+  }, {
+    "secondsSinceStart" : 129.727990291,
+    "pendingJobs" : 6279,
+    "activeAssignments" : 344,
+    "finishedJobs" : 3377,
+    "allocatedCpuMillis" : 398000,
+    "allocatedMemoryMb" : 760320,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 372500
+  }, {
+    "secondsSinceStart" : 130.735305541,
+    "pendingJobs" : 6255,
+    "activeAssignments" : 346,
+    "finishedJobs" : 3399,
+    "allocatedCpuMillis" : 399000,
+    "allocatedMemoryMb" : 764160,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 373000
+  }, {
+    "secondsSinceStart" : 131.7502045,
+    "pendingJobs" : 6229,
+    "activeAssignments" : 347,
+    "finishedJobs" : 3424,
+    "allocatedCpuMillis" : 398500,
+    "allocatedMemoryMb" : 771584,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369500
+  }, {
+    "secondsSinceStart" : 132.767349041,
+    "pendingJobs" : 6196,
+    "activeAssignments" : 348,
+    "finishedJobs" : 3456,
+    "allocatedCpuMillis" : 399500,
+    "allocatedMemoryMb" : 777984,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363000
+  }, {
+    "secondsSinceStart" : 133.784530041,
+    "pendingJobs" : 6162,
+    "activeAssignments" : 347,
+    "finishedJobs" : 3491,
+    "allocatedCpuMillis" : 399250,
+    "allocatedMemoryMb" : 774656,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357250
+  }, {
+    "secondsSinceStart" : 134.801892583,
+    "pendingJobs" : 6129,
+    "activeAssignments" : 348,
+    "finishedJobs" : 3523,
+    "allocatedCpuMillis" : 397000,
+    "allocatedMemoryMb" : 779264,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360250
+  }, {
+    "secondsSinceStart" : 135.812038333,
+    "pendingJobs" : 6111,
+    "activeAssignments" : 347,
+    "finishedJobs" : 3542,
+    "allocatedCpuMillis" : 397500,
+    "allocatedMemoryMb" : 783872,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 379250
+  }, {
+    "secondsSinceStart" : 136.824769791,
+    "pendingJobs" : 6082,
+    "activeAssignments" : 346,
+    "finishedJobs" : 3572,
+    "allocatedCpuMillis" : 397250,
+    "allocatedMemoryMb" : 784896,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362750
+  }, {
+    "secondsSinceStart" : 137.841393625,
+    "pendingJobs" : 6065,
+    "activeAssignments" : 345,
+    "finishedJobs" : 3590,
+    "allocatedCpuMillis" : 397000,
+    "allocatedMemoryMb" : 782080,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 382000
+  }, {
+    "secondsSinceStart" : 138.847070083,
+    "pendingJobs" : 6037,
+    "activeAssignments" : 344,
+    "finishedJobs" : 3619,
+    "allocatedCpuMillis" : 397250,
+    "allocatedMemoryMb" : 776448,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361750
+  }, {
+    "secondsSinceStart" : 139.859119583,
+    "pendingJobs" : 6005,
+    "activeAssignments" : 346,
+    "finishedJobs" : 3649,
+    "allocatedCpuMillis" : 398500,
+    "allocatedMemoryMb" : 775424,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357250
+  }, {
+    "secondsSinceStart" : 140.87222575,
+    "pendingJobs" : 5980,
+    "activeAssignments" : 343,
+    "finishedJobs" : 3677,
+    "allocatedCpuMillis" : 399000,
+    "allocatedMemoryMb" : 771328,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369000
+  }, {
+    "secondsSinceStart" : 141.883141416,
+    "pendingJobs" : 5956,
+    "activeAssignments" : 342,
+    "finishedJobs" : 3702,
+    "allocatedCpuMillis" : 398250,
+    "allocatedMemoryMb" : 768256,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 373250
+  }, {
+    "secondsSinceStart" : 142.900163166,
+    "pendingJobs" : 5941,
+    "activeAssignments" : 341,
+    "finishedJobs" : 3718,
+    "allocatedCpuMillis" : 397750,
+    "allocatedMemoryMb" : 769280,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 380750
+  }, {
+    "secondsSinceStart" : 143.909202833,
+    "pendingJobs" : 5922,
+    "activeAssignments" : 340,
+    "finishedJobs" : 3738,
+    "allocatedCpuMillis" : 397250,
+    "allocatedMemoryMb" : 769280,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371250
+  }, {
+    "secondsSinceStart" : 144.9285855,
+    "pendingJobs" : 5895,
+    "activeAssignments" : 341,
+    "finishedJobs" : 3764,
+    "allocatedCpuMillis" : 397250,
+    "allocatedMemoryMb" : 766208,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366250
+  }, {
+    "secondsSinceStart" : 145.943448083,
+    "pendingJobs" : 5864,
+    "activeAssignments" : 338,
+    "finishedJobs" : 3798,
+    "allocatedCpuMillis" : 396500,
+    "allocatedMemoryMb" : 764160,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 354500
+  }, {
+    "secondsSinceStart" : 146.955448625,
+    "pendingJobs" : 5837,
+    "activeAssignments" : 338,
+    "finishedJobs" : 3825,
+    "allocatedCpuMillis" : 395500,
+    "allocatedMemoryMb" : 771328,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364250
+  }, {
+    "secondsSinceStart" : 147.961729291,
+    "pendingJobs" : 5802,
+    "activeAssignments" : 340,
+    "finishedJobs" : 3858,
+    "allocatedCpuMillis" : 396500,
+    "allocatedMemoryMb" : 766208,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 354250
+  }, {
+    "secondsSinceStart" : 148.968494625,
+    "pendingJobs" : 5779,
+    "activeAssignments" : 338,
+    "finishedJobs" : 3883,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 753408,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368000
+  }, {
+    "secondsSinceStart" : 149.979389833,
+    "pendingJobs" : 5748,
+    "activeAssignments" : 341,
+    "finishedJobs" : 3911,
+    "allocatedCpuMillis" : 395750,
+    "allocatedMemoryMb" : 756224,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362500
+  }, {
+    "secondsSinceStart" : 150.992529916,
+    "pendingJobs" : 5725,
+    "activeAssignments" : 337,
+    "finishedJobs" : 3938,
+    "allocatedCpuMillis" : 395500,
+    "allocatedMemoryMb" : 748544,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 372750
+  }, {
+    "secondsSinceStart" : 152.001919958,
+    "pendingJobs" : 5708,
+    "activeAssignments" : 338,
+    "finishedJobs" : 3954,
+    "allocatedCpuMillis" : 396000,
+    "allocatedMemoryMb" : 750592,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 380500
+  }, {
+    "secondsSinceStart" : 153.014823625,
+    "pendingJobs" : 5685,
+    "activeAssignments" : 337,
+    "finishedJobs" : 3978,
+    "allocatedCpuMillis" : 397250,
+    "allocatedMemoryMb" : 746496,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371250
+  }, {
+    "secondsSinceStart" : 154.024192958,
+    "pendingJobs" : 5661,
+    "activeAssignments" : 338,
+    "finishedJobs" : 4001,
+    "allocatedCpuMillis" : 396500,
+    "allocatedMemoryMb" : 751616,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366500
+  }, {
+    "secondsSinceStart" : 155.040332375,
+    "pendingJobs" : 5637,
+    "activeAssignments" : 337,
+    "finishedJobs" : 4026,
+    "allocatedCpuMillis" : 396750,
+    "allocatedMemoryMb" : 745984,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367750
+  }, {
+    "secondsSinceStart" : 156.05660425,
+    "pendingJobs" : 5612,
+    "activeAssignments" : 335,
+    "finishedJobs" : 4053,
+    "allocatedCpuMillis" : 396500,
+    "allocatedMemoryMb" : 740864,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367250
+  }, {
+    "secondsSinceStart" : 157.066400708,
+    "pendingJobs" : 5585,
+    "activeAssignments" : 336,
+    "finishedJobs" : 4079,
+    "allocatedCpuMillis" : 396500,
+    "allocatedMemoryMb" : 746240,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361750
+  }, {
+    "secondsSinceStart" : 158.082719625,
+    "pendingJobs" : 5550,
+    "activeAssignments" : 334,
+    "finishedJobs" : 4116,
+    "allocatedCpuMillis" : 397000,
+    "allocatedMemoryMb" : 746496,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 351250
+  }, {
+    "secondsSinceStart" : 159.087696958,
+    "pendingJobs" : 5521,
+    "activeAssignments" : 335,
+    "finishedJobs" : 4144,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 749312,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362000
+  }, {
+    "secondsSinceStart" : 160.101462125,
+    "pendingJobs" : 5489,
+    "activeAssignments" : 338,
+    "finishedJobs" : 4173,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 755200,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358750
+  }, {
+    "secondsSinceStart" : 161.11800575,
+    "pendingJobs" : 5464,
+    "activeAssignments" : 337,
+    "finishedJobs" : 4199,
+    "allocatedCpuMillis" : 395500,
+    "allocatedMemoryMb" : 751360,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369500
+  }, {
+    "secondsSinceStart" : 162.132118375,
+    "pendingJobs" : 5447,
+    "activeAssignments" : 337,
+    "finishedJobs" : 4216,
+    "allocatedCpuMillis" : 395750,
+    "allocatedMemoryMb" : 753152,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 378500
+  }, {
+    "secondsSinceStart" : 163.153200625,
+    "pendingJobs" : 5424,
+    "activeAssignments" : 339,
+    "finishedJobs" : 4237,
+    "allocatedCpuMillis" : 395000,
+    "allocatedMemoryMb" : 759808,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368500
+  }, {
+    "secondsSinceStart" : 164.164215333,
+    "pendingJobs" : 5395,
+    "activeAssignments" : 339,
+    "finishedJobs" : 4266,
+    "allocatedCpuMillis" : 394750,
+    "allocatedMemoryMb" : 763392,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362750
+  }, {
+    "secondsSinceStart" : 165.171595541,
+    "pendingJobs" : 5367,
+    "activeAssignments" : 341,
+    "finishedJobs" : 4292,
+    "allocatedCpuMillis" : 396000,
+    "allocatedMemoryMb" : 770816,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363750
+  }, {
+    "secondsSinceStart" : 166.180102458,
+    "pendingJobs" : 5337,
+    "activeAssignments" : 343,
+    "finishedJobs" : 4320,
+    "allocatedCpuMillis" : 397000,
+    "allocatedMemoryMb" : 770304,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359750
+  }, {
+    "secondsSinceStart" : 167.198267791,
+    "pendingJobs" : 5313,
+    "activeAssignments" : 342,
+    "finishedJobs" : 4345,
+    "allocatedCpuMillis" : 397250,
+    "allocatedMemoryMb" : 769792,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 372750
+  }, {
+    "secondsSinceStart" : 168.209386458,
+    "pendingJobs" : 5289,
+    "activeAssignments" : 342,
+    "finishedJobs" : 4369,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 766208,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371500
+  }, {
+    "secondsSinceStart" : 169.22049975,
+    "pendingJobs" : 5268,
+    "activeAssignments" : 341,
+    "finishedJobs" : 4391,
+    "allocatedCpuMillis" : 392750,
+    "allocatedMemoryMb" : 762880,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368250
+  }, {
+    "secondsSinceStart" : 170.225433208,
+    "pendingJobs" : 5241,
+    "activeAssignments" : 340,
+    "finishedJobs" : 4419,
+    "allocatedCpuMillis" : 393500,
+    "allocatedMemoryMb" : 765440,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364750
+  }, {
+    "secondsSinceStart" : 171.237369708,
+    "pendingJobs" : 5216,
+    "activeAssignments" : 338,
+    "finishedJobs" : 4446,
+    "allocatedCpuMillis" : 394750,
+    "allocatedMemoryMb" : 760320,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367500
+  }, {
+    "secondsSinceStart" : 172.253619916,
+    "pendingJobs" : 5192,
+    "activeAssignments" : 335,
+    "finishedJobs" : 4473,
+    "allocatedCpuMillis" : 393500,
+    "allocatedMemoryMb" : 754688,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364750
+  }, {
+    "secondsSinceStart" : 173.265894375,
+    "pendingJobs" : 5164,
+    "activeAssignments" : 335,
+    "finishedJobs" : 4501,
+    "allocatedCpuMillis" : 395000,
+    "allocatedMemoryMb" : 749568,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363750
+  }, {
+    "secondsSinceStart" : 174.272369666,
+    "pendingJobs" : 5137,
+    "activeAssignments" : 336,
+    "finishedJobs" : 4527,
+    "allocatedCpuMillis" : 393500,
+    "allocatedMemoryMb" : 753664,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362500
+  }, {
+    "secondsSinceStart" : 175.284124833,
+    "pendingJobs" : 5115,
+    "activeAssignments" : 338,
+    "finishedJobs" : 4547,
+    "allocatedCpuMillis" : 396000,
+    "allocatedMemoryMb" : 755456,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369750
+  }, {
+    "secondsSinceStart" : 176.297186625,
+    "pendingJobs" : 5092,
+    "activeAssignments" : 338,
+    "finishedJobs" : 4570,
+    "allocatedCpuMillis" : 396750,
+    "allocatedMemoryMb" : 753664,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369500
+  }, {
+    "secondsSinceStart" : 177.310133791,
+    "pendingJobs" : 5067,
+    "activeAssignments" : 337,
+    "finishedJobs" : 4596,
+    "allocatedCpuMillis" : 395000,
+    "allocatedMemoryMb" : 758016,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368750
+  }, {
+    "secondsSinceStart" : 178.329774125,
+    "pendingJobs" : 5035,
+    "activeAssignments" : 339,
+    "finishedJobs" : 4626,
+    "allocatedCpuMillis" : 397750,
+    "allocatedMemoryMb" : 765440,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360250
+  }, {
+    "secondsSinceStart" : 179.339320458,
+    "pendingJobs" : 5000,
+    "activeAssignments" : 340,
+    "finishedJobs" : 4660,
+    "allocatedCpuMillis" : 397750,
+    "allocatedMemoryMb" : 764160,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363750
+  }, {
+    "secondsSinceStart" : 180.355252,
+    "pendingJobs" : 4972,
+    "activeAssignments" : 342,
+    "finishedJobs" : 4686,
+    "allocatedCpuMillis" : 395250,
+    "allocatedMemoryMb" : 765440,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368000
+  }, {
+    "secondsSinceStart" : 181.364516958,
+    "pendingJobs" : 4942,
+    "activeAssignments" : 345,
+    "finishedJobs" : 4713,
+    "allocatedCpuMillis" : 396500,
+    "allocatedMemoryMb" : 771072,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365250
+  }, {
+    "secondsSinceStart" : 182.382566458,
+    "pendingJobs" : 4908,
+    "activeAssignments" : 345,
+    "finishedJobs" : 4747,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 775424,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 353750
+  }, {
+    "secondsSinceStart" : 183.3956235,
+    "pendingJobs" : 4877,
+    "activeAssignments" : 344,
+    "finishedJobs" : 4779,
+    "allocatedCpuMillis" : 396750,
+    "allocatedMemoryMb" : 772608,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360250
+  }, {
+    "secondsSinceStart" : 184.405012125,
+    "pendingJobs" : 4856,
+    "activeAssignments" : 345,
+    "finishedJobs" : 4799,
+    "allocatedCpuMillis" : 395750,
+    "allocatedMemoryMb" : 771072,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 373000
+  }, {
+    "secondsSinceStart" : 185.419117708,
+    "pendingJobs" : 4832,
+    "activeAssignments" : 348,
+    "finishedJobs" : 4820,
+    "allocatedCpuMillis" : 396750,
+    "allocatedMemoryMb" : 770816,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 374250
+  }, {
+    "secondsSinceStart" : 186.449410583,
+    "pendingJobs" : 4812,
+    "activeAssignments" : 348,
+    "finishedJobs" : 4840,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 768768,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 374250
+  }, {
+    "secondsSinceStart" : 187.462121083,
+    "pendingJobs" : 4792,
+    "activeAssignments" : 348,
+    "finishedJobs" : 4860,
+    "allocatedCpuMillis" : 396000,
+    "allocatedMemoryMb" : 771328,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 378000
+  }, {
+    "secondsSinceStart" : 188.475577833,
+    "pendingJobs" : 4765,
+    "activeAssignments" : 347,
+    "finishedJobs" : 4888,
+    "allocatedCpuMillis" : 394250,
+    "allocatedMemoryMb" : 772096,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366000
+  }, {
+    "secondsSinceStart" : 189.48512925,
+    "pendingJobs" : 4729,
+    "activeAssignments" : 351,
+    "finishedJobs" : 4920,
+    "allocatedCpuMillis" : 394750,
+    "allocatedMemoryMb" : 774656,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 353000
+  }, {
+    "secondsSinceStart" : 190.499927166,
+    "pendingJobs" : 4704,
+    "activeAssignments" : 350,
+    "finishedJobs" : 4946,
+    "allocatedCpuMillis" : 392000,
+    "allocatedMemoryMb" : 771584,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365250
+  }, {
+    "secondsSinceStart" : 191.509948416,
+    "pendingJobs" : 4681,
+    "activeAssignments" : 351,
+    "finishedJobs" : 4968,
+    "allocatedCpuMillis" : 392250,
+    "allocatedMemoryMb" : 776704,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367500
+  }, {
+    "secondsSinceStart" : 192.526264708,
+    "pendingJobs" : 4649,
+    "activeAssignments" : 352,
+    "finishedJobs" : 4999,
+    "allocatedCpuMillis" : 393750,
+    "allocatedMemoryMb" : 776704,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 354000
+  }, {
+    "secondsSinceStart" : 193.536324833,
+    "pendingJobs" : 4625,
+    "activeAssignments" : 354,
+    "finishedJobs" : 5021,
+    "allocatedCpuMillis" : 394250,
+    "allocatedMemoryMb" : 778752,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369000
+  }, {
+    "secondsSinceStart" : 194.544484708,
+    "pendingJobs" : 4601,
+    "activeAssignments" : 354,
+    "finishedJobs" : 5045,
+    "allocatedCpuMillis" : 393750,
+    "allocatedMemoryMb" : 772608,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369250
+  }, {
+    "secondsSinceStart" : 195.556903708,
+    "pendingJobs" : 4575,
+    "activeAssignments" : 355,
+    "finishedJobs" : 5070,
+    "allocatedCpuMillis" : 395000,
+    "allocatedMemoryMb" : 770304,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363500
+  }, {
+    "secondsSinceStart" : 196.564920875,
+    "pendingJobs" : 4547,
+    "activeAssignments" : 357,
+    "finishedJobs" : 5096,
+    "allocatedCpuMillis" : 394750,
+    "allocatedMemoryMb" : 768000,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368000
+  }, {
+    "secondsSinceStart" : 197.572264875,
+    "pendingJobs" : 4520,
+    "activeAssignments" : 358,
+    "finishedJobs" : 5122,
+    "allocatedCpuMillis" : 395000,
+    "allocatedMemoryMb" : 759040,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368750
+  }, {
+    "secondsSinceStart" : 198.584684625,
+    "pendingJobs" : 4497,
+    "activeAssignments" : 360,
+    "finishedJobs" : 5143,
+    "allocatedCpuMillis" : 394000,
+    "allocatedMemoryMb" : 759808,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369500
+  }, {
+    "secondsSinceStart" : 199.597494833,
+    "pendingJobs" : 4469,
+    "activeAssignments" : 357,
+    "finishedJobs" : 5174,
+    "allocatedCpuMillis" : 394000,
+    "allocatedMemoryMb" : 757504,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357000
+  }, {
+    "secondsSinceStart" : 200.613737458,
+    "pendingJobs" : 4438,
+    "activeAssignments" : 359,
+    "finishedJobs" : 5203,
+    "allocatedCpuMillis" : 393750,
+    "allocatedMemoryMb" : 755456,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362000
+  }, {
+    "secondsSinceStart" : 201.627484916,
+    "pendingJobs" : 4404,
+    "activeAssignments" : 362,
+    "finishedJobs" : 5234,
+    "allocatedCpuMillis" : 393250,
+    "allocatedMemoryMb" : 757248,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 355250
+  }, {
+    "secondsSinceStart" : 202.642305,
+    "pendingJobs" : 4377,
+    "activeAssignments" : 364,
+    "finishedJobs" : 5259,
+    "allocatedCpuMillis" : 392250,
+    "allocatedMemoryMb" : 760576,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359750
+  }, {
+    "secondsSinceStart" : 203.650294541,
+    "pendingJobs" : 4347,
+    "activeAssignments" : 363,
+    "finishedJobs" : 5290,
+    "allocatedCpuMillis" : 390000,
+    "allocatedMemoryMb" : 752896,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363000
+  }, {
+    "secondsSinceStart" : 204.661996458,
+    "pendingJobs" : 4332,
+    "activeAssignments" : 358,
+    "finishedJobs" : 5310,
+    "allocatedCpuMillis" : 386750,
+    "allocatedMemoryMb" : 742912,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 372500
+  }, {
+    "secondsSinceStart" : 205.669655875,
+    "pendingJobs" : 4298,
+    "activeAssignments" : 358,
+    "finishedJobs" : 5344,
+    "allocatedCpuMillis" : 389000,
+    "allocatedMemoryMb" : 744960,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359750
+  }, {
+    "secondsSinceStart" : 206.677661541,
+    "pendingJobs" : 4262,
+    "activeAssignments" : 355,
+    "finishedJobs" : 5383,
+    "allocatedCpuMillis" : 385500,
+    "allocatedMemoryMb" : 734976,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 353750
+  }, {
+    "secondsSinceStart" : 207.683337583,
+    "pendingJobs" : 4231,
+    "activeAssignments" : 351,
+    "finishedJobs" : 5418,
+    "allocatedCpuMillis" : 381500,
+    "allocatedMemoryMb" : 737024,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363500
+  }, {
+    "secondsSinceStart" : 208.690047291,
+    "pendingJobs" : 4200,
+    "activeAssignments" : 355,
+    "finishedJobs" : 5445,
+    "allocatedCpuMillis" : 388500,
+    "allocatedMemoryMb" : 754432,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368750
+  }, {
+    "secondsSinceStart" : 209.703024791,
+    "pendingJobs" : 4171,
+    "activeAssignments" : 354,
+    "finishedJobs" : 5475,
+    "allocatedCpuMillis" : 388500,
+    "allocatedMemoryMb" : 754688,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364250
+  }, {
+    "secondsSinceStart" : 210.720420083,
+    "pendingJobs" : 4141,
+    "activeAssignments" : 357,
+    "finishedJobs" : 5502,
+    "allocatedCpuMillis" : 389250,
+    "allocatedMemoryMb" : 754688,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366750
+  }, {
+    "secondsSinceStart" : 211.735744375,
+    "pendingJobs" : 4115,
+    "activeAssignments" : 358,
+    "finishedJobs" : 5527,
+    "allocatedCpuMillis" : 387750,
+    "allocatedMemoryMb" : 759296,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368750
+  }, {
+    "secondsSinceStart" : 212.744247208,
+    "pendingJobs" : 4091,
+    "activeAssignments" : 350,
+    "finishedJobs" : 5559,
+    "allocatedCpuMillis" : 379250,
+    "allocatedMemoryMb" : 741888,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362750
+  }, {
+    "secondsSinceStart" : 213.75547875,
+    "pendingJobs" : 4058,
+    "activeAssignments" : 347,
+    "finishedJobs" : 5595,
+    "allocatedCpuMillis" : 381000,
+    "allocatedMemoryMb" : 743680,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357250
+  }, {
+    "secondsSinceStart" : 214.771231208,
+    "pendingJobs" : 4036,
+    "activeAssignments" : 338,
+    "finishedJobs" : 5626,
+    "allocatedCpuMillis" : 368750,
+    "allocatedMemoryMb" : 727296,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361000
+  }, {
+    "secondsSinceStart" : 215.783974083,
+    "pendingJobs" : 4011,
+    "activeAssignments" : 346,
+    "finishedJobs" : 5643,
+    "allocatedCpuMillis" : 380000,
+    "allocatedMemoryMb" : 744448,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360250
+  }, {
+    "secondsSinceStart" : 216.790900125,
+    "pendingJobs" : 3976,
+    "activeAssignments" : 355,
+    "finishedJobs" : 5669,
+    "allocatedCpuMillis" : 390250,
+    "allocatedMemoryMb" : 764928,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360500
+  }, {
+    "secondsSinceStart" : 217.800247458,
+    "pendingJobs" : 3957,
+    "activeAssignments" : 343,
+    "finishedJobs" : 5700,
+    "allocatedCpuMillis" : 375500,
+    "allocatedMemoryMb" : 742912,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 355500
+  }, {
+    "secondsSinceStart" : 218.804884125,
+    "pendingJobs" : 3931,
+    "activeAssignments" : 346,
+    "finishedJobs" : 5723,
+    "allocatedCpuMillis" : 380750,
+    "allocatedMemoryMb" : 744448,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364500
+  }, {
+    "secondsSinceStart" : 219.809984291,
+    "pendingJobs" : 3901,
+    "activeAssignments" : 347,
+    "finishedJobs" : 5752,
+    "allocatedCpuMillis" : 384750,
+    "allocatedMemoryMb" : 749312,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358750
+  }, {
+    "secondsSinceStart" : 220.8183585,
+    "pendingJobs" : 3874,
+    "activeAssignments" : 349,
+    "finishedJobs" : 5777,
+    "allocatedCpuMillis" : 384000,
+    "allocatedMemoryMb" : 750080,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362000
+  }, {
+    "secondsSinceStart" : 221.82335625,
+    "pendingJobs" : 3845,
+    "activeAssignments" : 354,
+    "finishedJobs" : 5801,
+    "allocatedCpuMillis" : 391000,
+    "allocatedMemoryMb" : 758784,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364750
+  }, {
+    "secondsSinceStart" : 222.835558541,
+    "pendingJobs" : 3823,
+    "activeAssignments" : 353,
+    "finishedJobs" : 5824,
+    "allocatedCpuMillis" : 388250,
+    "allocatedMemoryMb" : 758016,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368500
+  }, {
+    "secondsSinceStart" : 223.84127475,
+    "pendingJobs" : 3793,
+    "activeAssignments" : 356,
+    "finishedJobs" : 5851,
+    "allocatedCpuMillis" : 392250,
+    "allocatedMemoryMb" : 768768,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359000
+  }, {
+    "secondsSinceStart" : 224.849540666,
+    "pendingJobs" : 3771,
+    "activeAssignments" : 341,
+    "finishedJobs" : 5888,
+    "allocatedCpuMillis" : 378500,
+    "allocatedMemoryMb" : 729856,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 355500
+  }, {
+    "secondsSinceStart" : 225.857330791,
+    "pendingJobs" : 3732,
+    "activeAssignments" : 351,
+    "finishedJobs" : 5917,
+    "allocatedCpuMillis" : 392750,
+    "allocatedMemoryMb" : 762624,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363250
+  }, {
+    "secondsSinceStart" : 226.861834625,
+    "pendingJobs" : 3720,
+    "activeAssignments" : 341,
+    "finishedJobs" : 5939,
+    "allocatedCpuMillis" : 383500,
+    "allocatedMemoryMb" : 752896,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369000
+  }, {
+    "secondsSinceStart" : 227.866885583,
+    "pendingJobs" : 3684,
+    "activeAssignments" : 350,
+    "finishedJobs" : 5966,
+    "allocatedCpuMillis" : 392250,
+    "allocatedMemoryMb" : 763904,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363250
+  }, {
+    "secondsSinceStart" : 228.873777916,
+    "pendingJobs" : 3665,
+    "activeAssignments" : 342,
+    "finishedJobs" : 5993,
+    "allocatedCpuMillis" : 385750,
+    "allocatedMemoryMb" : 746240,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361000
+  }, {
+    "secondsSinceStart" : 229.881689541,
+    "pendingJobs" : 3632,
+    "activeAssignments" : 349,
+    "finishedJobs" : 6019,
+    "allocatedCpuMillis" : 390000,
+    "allocatedMemoryMb" : 757760,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363250
+  }, {
+    "secondsSinceStart" : 230.888504,
+    "pendingJobs" : 3613,
+    "activeAssignments" : 338,
+    "finishedJobs" : 6049,
+    "allocatedCpuMillis" : 380500,
+    "allocatedMemoryMb" : 730368,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358000
+  }, {
+    "secondsSinceStart" : 231.897464166,
+    "pendingJobs" : 3565,
+    "activeAssignments" : 344,
+    "finishedJobs" : 6091,
+    "allocatedCpuMillis" : 389750,
+    "allocatedMemoryMb" : 761344,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 346750
+  }, {
+    "secondsSinceStart" : 232.904695791,
+    "pendingJobs" : 3545,
+    "activeAssignments" : 337,
+    "finishedJobs" : 6118,
+    "allocatedCpuMillis" : 381250,
+    "allocatedMemoryMb" : 737280,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364000
+  }, {
+    "secondsSinceStart" : 233.914258,
+    "pendingJobs" : 3511,
+    "activeAssignments" : 344,
+    "finishedJobs" : 6145,
+    "allocatedCpuMillis" : 390000,
+    "allocatedMemoryMb" : 756992,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358000
+  }, {
+    "secondsSinceStart" : 234.929636375,
+    "pendingJobs" : 3489,
+    "activeAssignments" : 338,
+    "finishedJobs" : 6173,
+    "allocatedCpuMillis" : 384000,
+    "allocatedMemoryMb" : 736512,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365000
+  }, {
+    "secondsSinceStart" : 235.937229708,
+    "pendingJobs" : 3465,
+    "activeAssignments" : 339,
+    "finishedJobs" : 6196,
+    "allocatedCpuMillis" : 387500,
+    "allocatedMemoryMb" : 743424,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366250
+  }, {
+    "secondsSinceStart" : 236.943547333,
+    "pendingJobs" : 3445,
+    "activeAssignments" : 345,
+    "finishedJobs" : 6210,
+    "allocatedCpuMillis" : 395250,
+    "allocatedMemoryMb" : 752896,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 380750
+  }, {
+    "secondsSinceStart" : 237.947647208,
+    "pendingJobs" : 3420,
+    "activeAssignments" : 343,
+    "finishedJobs" : 6237,
+    "allocatedCpuMillis" : 392250,
+    "allocatedMemoryMb" : 754688,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364750
+  }, {
+    "secondsSinceStart" : 238.956818333,
+    "pendingJobs" : 3396,
+    "activeAssignments" : 334,
+    "finishedJobs" : 6270,
+    "allocatedCpuMillis" : 385500,
+    "allocatedMemoryMb" : 734208,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364500
+  }, {
+    "secondsSinceStart" : 239.961320208,
+    "pendingJobs" : 3366,
+    "activeAssignments" : 342,
+    "finishedJobs" : 6292,
+    "allocatedCpuMillis" : 395250,
+    "allocatedMemoryMb" : 756224,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370000
+  }, {
+    "secondsSinceStart" : 240.971003875,
+    "pendingJobs" : 3343,
+    "activeAssignments" : 336,
+    "finishedJobs" : 6321,
+    "allocatedCpuMillis" : 390750,
+    "allocatedMemoryMb" : 749312,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363250
+  }, {
+    "secondsSinceStart" : 241.975761625,
+    "pendingJobs" : 3323,
+    "activeAssignments" : 340,
+    "finishedJobs" : 6337,
+    "allocatedCpuMillis" : 396750,
+    "allocatedMemoryMb" : 765952,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 376250
+  }, {
+    "secondsSinceStart" : 242.983641375,
+    "pendingJobs" : 3297,
+    "activeAssignments" : 335,
+    "finishedJobs" : 6368,
+    "allocatedCpuMillis" : 393500,
+    "allocatedMemoryMb" : 743168,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363750
+  }, {
+    "secondsSinceStart" : 243.991621875,
+    "pendingJobs" : 3269,
+    "activeAssignments" : 332,
+    "finishedJobs" : 6399,
+    "allocatedCpuMillis" : 384750,
+    "allocatedMemoryMb" : 734976,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361750
+  }, {
+    "secondsSinceStart" : 244.99917725,
+    "pendingJobs" : 3232,
+    "activeAssignments" : 342,
+    "finishedJobs" : 6426,
+    "allocatedCpuMillis" : 397250,
+    "allocatedMemoryMb" : 745728,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367500
+  }, {
+    "secondsSinceStart" : 246.009900958,
+    "pendingJobs" : 3207,
+    "activeAssignments" : 336,
+    "finishedJobs" : 6457,
+    "allocatedCpuMillis" : 389000,
+    "allocatedMemoryMb" : 736256,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362500
+  }, {
+    "secondsSinceStart" : 247.014794208,
+    "pendingJobs" : 3173,
+    "activeAssignments" : 343,
+    "finishedJobs" : 6484,
+    "allocatedCpuMillis" : 397000,
+    "allocatedMemoryMb" : 753152,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366000
+  }, {
+    "secondsSinceStart" : 248.02013775,
+    "pendingJobs" : 3154,
+    "activeAssignments" : 335,
+    "finishedJobs" : 6511,
+    "allocatedCpuMillis" : 387250,
+    "allocatedMemoryMb" : 743424,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366000
+  }, {
+    "secondsSinceStart" : 249.026341041,
+    "pendingJobs" : 3116,
+    "activeAssignments" : 345,
+    "finishedJobs" : 6539,
+    "allocatedCpuMillis" : 395000,
+    "allocatedMemoryMb" : 764160,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363000
+  }, {
+    "secondsSinceStart" : 250.037084083,
+    "pendingJobs" : 3103,
+    "activeAssignments" : 335,
+    "finishedJobs" : 6562,
+    "allocatedCpuMillis" : 386250,
+    "allocatedMemoryMb" : 736000,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369250
+  }, {
+    "secondsSinceStart" : 251.04638375,
+    "pendingJobs" : 3060,
+    "activeAssignments" : 346,
+    "finishedJobs" : 6594,
+    "allocatedCpuMillis" : 396250,
+    "allocatedMemoryMb" : 754432,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358750
+  }, {
+    "secondsSinceStart" : 252.052655375,
+    "pendingJobs" : 3044,
+    "activeAssignments" : 341,
+    "finishedJobs" : 6615,
+    "allocatedCpuMillis" : 390000,
+    "allocatedMemoryMb" : 745984,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370000
+  }, {
+    "secondsSinceStart" : 253.060971208,
+    "pendingJobs" : 3027,
+    "activeAssignments" : 343,
+    "finishedJobs" : 6630,
+    "allocatedCpuMillis" : 390750,
+    "allocatedMemoryMb" : 742656,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 378000
+  }, {
+    "secondsSinceStart" : 254.069058708,
+    "pendingJobs" : 3008,
+    "activeAssignments" : 335,
+    "finishedJobs" : 6657,
+    "allocatedCpuMillis" : 383000,
+    "allocatedMemoryMb" : 730880,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365250
+  }, {
+    "secondsSinceStart" : 255.080321375,
+    "pendingJobs" : 2978,
+    "activeAssignments" : 344,
+    "finishedJobs" : 6678,
+    "allocatedCpuMillis" : 392000,
+    "allocatedMemoryMb" : 751104,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 372750
+  }, {
+    "secondsSinceStart" : 256.092784958,
+    "pendingJobs" : 2947,
+    "activeAssignments" : 344,
+    "finishedJobs" : 6709,
+    "allocatedCpuMillis" : 394750,
+    "allocatedMemoryMb" : 751872,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359500
+  }, {
+    "secondsSinceStart" : 257.100619833,
+    "pendingJobs" : 2923,
+    "activeAssignments" : 338,
+    "finishedJobs" : 6739,
+    "allocatedCpuMillis" : 389750,
+    "allocatedMemoryMb" : 728832,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361500
+  }, {
+    "secondsSinceStart" : 258.113877166,
+    "pendingJobs" : 2881,
+    "activeAssignments" : 343,
+    "finishedJobs" : 6776,
+    "allocatedCpuMillis" : 396750,
+    "allocatedMemoryMb" : 733696,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 355750
+  }, {
+    "secondsSinceStart" : 259.127324958,
+    "pendingJobs" : 2857,
+    "activeAssignments" : 343,
+    "finishedJobs" : 6800,
+    "allocatedCpuMillis" : 393000,
+    "allocatedMemoryMb" : 732416,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369750
+  }, {
+    "secondsSinceStart" : 260.1360475,
+    "pendingJobs" : 2833,
+    "activeAssignments" : 343,
+    "finishedJobs" : 6824,
+    "allocatedCpuMillis" : 396500,
+    "allocatedMemoryMb" : 737024,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 373500
+  }, {
+    "secondsSinceStart" : 261.141869125,
+    "pendingJobs" : 2807,
+    "activeAssignments" : 341,
+    "finishedJobs" : 6852,
+    "allocatedCpuMillis" : 392750,
+    "allocatedMemoryMb" : 726016,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368000
+  }, {
+    "secondsSinceStart" : 262.150522083,
+    "pendingJobs" : 2774,
+    "activeAssignments" : 343,
+    "finishedJobs" : 6883,
+    "allocatedCpuMillis" : 391250,
+    "allocatedMemoryMb" : 736512,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358500
+  }, {
+    "secondsSinceStart" : 263.155388666,
+    "pendingJobs" : 2742,
+    "activeAssignments" : 342,
+    "finishedJobs" : 6916,
+    "allocatedCpuMillis" : 389000,
+    "allocatedMemoryMb" : 733696,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 350500
+  }, {
+    "secondsSinceStart" : 264.160935,
+    "pendingJobs" : 2715,
+    "activeAssignments" : 342,
+    "finishedJobs" : 6943,
+    "allocatedCpuMillis" : 384250,
+    "allocatedMemoryMb" : 737024,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361250
+  }, {
+    "secondsSinceStart" : 265.167571458,
+    "pendingJobs" : 2680,
+    "activeAssignments" : 345,
+    "finishedJobs" : 6975,
+    "allocatedCpuMillis" : 389500,
+    "allocatedMemoryMb" : 745984,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360500
+  }, {
+    "secondsSinceStart" : 266.176953791,
+    "pendingJobs" : 2654,
+    "activeAssignments" : 345,
+    "finishedJobs" : 7001,
+    "allocatedCpuMillis" : 386000,
+    "allocatedMemoryMb" : 740352,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368500
+  }, {
+    "secondsSinceStart" : 267.181960875,
+    "pendingJobs" : 2622,
+    "activeAssignments" : 348,
+    "finishedJobs" : 7030,
+    "allocatedCpuMillis" : 390500,
+    "allocatedMemoryMb" : 750336,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363500
+  }, {
+    "secondsSinceStart" : 268.18838575,
+    "pendingJobs" : 2600,
+    "activeAssignments" : 349,
+    "finishedJobs" : 7051,
+    "allocatedCpuMillis" : 390000,
+    "allocatedMemoryMb" : 746496,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 373500
+  }, {
+    "secondsSinceStart" : 269.206655958,
+    "pendingJobs" : 2567,
+    "activeAssignments" : 356,
+    "finishedJobs" : 7077,
+    "allocatedCpuMillis" : 395000,
+    "allocatedMemoryMb" : 756992,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364750
+  }, {
+    "secondsSinceStart" : 270.211544083,
+    "pendingJobs" : 2539,
+    "activeAssignments" : 353,
+    "finishedJobs" : 7108,
+    "allocatedCpuMillis" : 391500,
+    "allocatedMemoryMb" : 745472,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362750
+  }, {
+    "secondsSinceStart" : 271.221697,
+    "pendingJobs" : 2502,
+    "activeAssignments" : 359,
+    "finishedJobs" : 7139,
+    "allocatedCpuMillis" : 396000,
+    "allocatedMemoryMb" : 757248,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360250
+  }, {
+    "secondsSinceStart" : 272.227519458,
+    "pendingJobs" : 2494,
+    "activeAssignments" : 336,
+    "finishedJobs" : 7170,
+    "allocatedCpuMillis" : 368000,
+    "allocatedMemoryMb" : 710656,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360000
+  }, {
+    "secondsSinceStart" : 273.232136875,
+    "pendingJobs" : 2464,
+    "activeAssignments" : 336,
+    "finishedJobs" : 7200,
+    "allocatedCpuMillis" : 369500,
+    "allocatedMemoryMb" : 708352,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361000
+  }, {
+    "secondsSinceStart" : 274.243825458,
+    "pendingJobs" : 2439,
+    "activeAssignments" : 341,
+    "finishedJobs" : 7220,
+    "allocatedCpuMillis" : 383500,
+    "allocatedMemoryMb" : 730624,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361750
+  }, {
+    "secondsSinceStart" : 275.26590275,
+    "pendingJobs" : 2415,
+    "activeAssignments" : 346,
+    "finishedJobs" : 7239,
+    "allocatedCpuMillis" : 388750,
+    "allocatedMemoryMb" : 744448,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365000
+  }, {
+    "secondsSinceStart" : 276.282485958,
+    "pendingJobs" : 2380,
+    "activeAssignments" : 354,
+    "finishedJobs" : 7266,
+    "allocatedCpuMillis" : 395250,
+    "allocatedMemoryMb" : 763648,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359000
+  }, {
+    "secondsSinceStart" : 277.299437833,
+    "pendingJobs" : 2352,
+    "activeAssignments" : 353,
+    "finishedJobs" : 7295,
+    "allocatedCpuMillis" : 392500,
+    "allocatedMemoryMb" : 757504,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363250
+  }, {
+    "secondsSinceStart" : 278.330684125,
+    "pendingJobs" : 2325,
+    "activeAssignments" : 352,
+    "finishedJobs" : 7323,
+    "allocatedCpuMillis" : 394000,
+    "allocatedMemoryMb" : 762112,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368250
+  }, {
+    "secondsSinceStart" : 279.364838208,
+    "pendingJobs" : 2298,
+    "activeAssignments" : 352,
+    "finishedJobs" : 7350,
+    "allocatedCpuMillis" : 393750,
+    "allocatedMemoryMb" : 759296,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365750
+  }, {
+    "secondsSinceStart" : 280.381512208,
+    "pendingJobs" : 2263,
+    "activeAssignments" : 357,
+    "finishedJobs" : 7380,
+    "allocatedCpuMillis" : 392500,
+    "allocatedMemoryMb" : 756736,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363000
+  }, {
+    "secondsSinceStart" : 281.398760166,
+    "pendingJobs" : 2232,
+    "activeAssignments" : 358,
+    "finishedJobs" : 7410,
+    "allocatedCpuMillis" : 392000,
+    "allocatedMemoryMb" : 751872,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364250
+  }, {
+    "secondsSinceStart" : 282.410718583,
+    "pendingJobs" : 2205,
+    "activeAssignments" : 350,
+    "finishedJobs" : 7445,
+    "allocatedCpuMillis" : 384000,
+    "allocatedMemoryMb" : 749568,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369000
+  }, {
+    "secondsSinceStart" : 283.421070458,
+    "pendingJobs" : 2170,
+    "activeAssignments" : 356,
+    "finishedJobs" : 7474,
+    "allocatedCpuMillis" : 385000,
+    "allocatedMemoryMb" : 764672,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359250
+  }, {
+    "secondsSinceStart" : 284.429933375,
+    "pendingJobs" : 2154,
+    "activeAssignments" : 353,
+    "finishedJobs" : 7493,
+    "allocatedCpuMillis" : 383250,
+    "allocatedMemoryMb" : 759040,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369500
+  }, {
+    "secondsSinceStart" : 285.435141791,
+    "pendingJobs" : 2125,
+    "activeAssignments" : 356,
+    "finishedJobs" : 7519,
+    "allocatedCpuMillis" : 389000,
+    "allocatedMemoryMb" : 758272,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365250
+  }, {
+    "secondsSinceStart" : 286.440629416,
+    "pendingJobs" : 2094,
+    "activeAssignments" : 357,
+    "finishedJobs" : 7549,
+    "allocatedCpuMillis" : 386250,
+    "allocatedMemoryMb" : 751616,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359500
+  }, {
+    "secondsSinceStart" : 287.44633675,
+    "pendingJobs" : 2068,
+    "activeAssignments" : 348,
+    "finishedJobs" : 7584,
+    "allocatedCpuMillis" : 376750,
+    "allocatedMemoryMb" : 730368,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357500
+  }, {
+    "secondsSinceStart" : 288.454730791,
+    "pendingJobs" : 2038,
+    "activeAssignments" : 352,
+    "finishedJobs" : 7610,
+    "allocatedCpuMillis" : 381000,
+    "allocatedMemoryMb" : 741632,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364250
+  }, {
+    "secondsSinceStart" : 289.462444,
+    "pendingJobs" : 2008,
+    "activeAssignments" : 354,
+    "finishedJobs" : 7638,
+    "allocatedCpuMillis" : 384000,
+    "allocatedMemoryMb" : 751872,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364250
+  }, {
+    "secondsSinceStart" : 290.472530083,
+    "pendingJobs" : 1992,
+    "activeAssignments" : 353,
+    "finishedJobs" : 7655,
+    "allocatedCpuMillis" : 384000,
+    "allocatedMemoryMb" : 747520,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 376250
+  }, {
+    "secondsSinceStart" : 291.478350583,
+    "pendingJobs" : 1958,
+    "activeAssignments" : 351,
+    "finishedJobs" : 7691,
+    "allocatedCpuMillis" : 377000,
+    "allocatedMemoryMb" : 740608,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358750
+  }, {
+    "secondsSinceStart" : 292.486805291,
+    "pendingJobs" : 1922,
+    "activeAssignments" : 354,
+    "finishedJobs" : 7724,
+    "allocatedCpuMillis" : 387250,
+    "allocatedMemoryMb" : 744192,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370750
+  }, {
+    "secondsSinceStart" : 293.497088666,
+    "pendingJobs" : 1902,
+    "activeAssignments" : 349,
+    "finishedJobs" : 7749,
+    "allocatedCpuMillis" : 376000,
+    "allocatedMemoryMb" : 736000,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368000
+  }, {
+    "secondsSinceStart" : 294.501205083,
+    "pendingJobs" : 1873,
+    "activeAssignments" : 353,
+    "finishedJobs" : 7774,
+    "allocatedCpuMillis" : 388250,
+    "allocatedMemoryMb" : 744448,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 374750
+  }, {
+    "secondsSinceStart" : 295.50655225,
+    "pendingJobs" : 1847,
+    "activeAssignments" : 355,
+    "finishedJobs" : 7798,
+    "allocatedCpuMillis" : 381750,
+    "allocatedMemoryMb" : 759296,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357500
+  }, {
+    "secondsSinceStart" : 296.512600625,
+    "pendingJobs" : 1817,
+    "activeAssignments" : 356,
+    "finishedJobs" : 7827,
+    "allocatedCpuMillis" : 388500,
+    "allocatedMemoryMb" : 751616,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369000
+  }, {
+    "secondsSinceStart" : 297.524579458,
+    "pendingJobs" : 1788,
+    "activeAssignments" : 348,
+    "finishedJobs" : 7864,
+    "allocatedCpuMillis" : 372750,
+    "allocatedMemoryMb" : 728576,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 350750
+  }, {
+    "secondsSinceStart" : 298.534303541,
+    "pendingJobs" : 1758,
+    "activeAssignments" : 348,
+    "finishedJobs" : 7894,
+    "allocatedCpuMillis" : 385500,
+    "allocatedMemoryMb" : 732672,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370000
+  }, {
+    "secondsSinceStart" : 299.543393041,
+    "pendingJobs" : 1713,
+    "activeAssignments" : 354,
+    "finishedJobs" : 7933,
+    "allocatedCpuMillis" : 389250,
+    "allocatedMemoryMb" : 754432,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 356000
+  }, {
+    "secondsSinceStart" : 300.551451375,
+    "pendingJobs" : 1696,
+    "activeAssignments" : 347,
+    "finishedJobs" : 7957,
+    "allocatedCpuMillis" : 377750,
+    "allocatedMemoryMb" : 730880,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368750
+  }, {
+    "secondsSinceStart" : 301.561235583,
+    "pendingJobs" : 1653,
+    "activeAssignments" : 360,
+    "finishedJobs" : 7987,
+    "allocatedCpuMillis" : 396000,
+    "allocatedMemoryMb" : 767744,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368000
+  }, {
+    "secondsSinceStart" : 302.569283291,
+    "pendingJobs" : 1638,
+    "activeAssignments" : 346,
+    "finishedJobs" : 8016,
+    "allocatedCpuMillis" : 382500,
+    "allocatedMemoryMb" : 743424,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369000
+  }, {
+    "secondsSinceStart" : 303.577028791,
+    "pendingJobs" : 1609,
+    "activeAssignments" : 339,
+    "finishedJobs" : 8052,
+    "allocatedCpuMillis" : 368750,
+    "allocatedMemoryMb" : 726016,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357750
+  }, {
+    "secondsSinceStart" : 304.585864291,
+    "pendingJobs" : 1571,
+    "activeAssignments" : 350,
+    "finishedJobs" : 8079,
+    "allocatedCpuMillis" : 385500,
+    "allocatedMemoryMb" : 745728,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 368750
+  }, {
+    "secondsSinceStart" : 305.594033375,
+    "pendingJobs" : 1538,
+    "activeAssignments" : 356,
+    "finishedJobs" : 8106,
+    "allocatedCpuMillis" : 390250,
+    "allocatedMemoryMb" : 754688,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 376000
+  }, {
+    "secondsSinceStart" : 306.600286875,
+    "pendingJobs" : 1520,
+    "activeAssignments" : 350,
+    "finishedJobs" : 8130,
+    "allocatedCpuMillis" : 381250,
+    "allocatedMemoryMb" : 739072,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366500
+  }, {
+    "secondsSinceStart" : 307.606984208,
+    "pendingJobs" : 1485,
+    "activeAssignments" : 356,
+    "finishedJobs" : 8159,
+    "allocatedCpuMillis" : 389750,
+    "allocatedMemoryMb" : 766976,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364750
+  }, {
+    "secondsSinceStart" : 308.612419875,
+    "pendingJobs" : 1470,
+    "activeAssignments" : 335,
+    "finishedJobs" : 8195,
+    "allocatedCpuMillis" : 366250,
+    "allocatedMemoryMb" : 734976,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 354500
+  }, {
+    "secondsSinceStart" : 309.618921,
+    "pendingJobs" : 1428,
+    "activeAssignments" : 357,
+    "finishedJobs" : 8215,
+    "allocatedCpuMillis" : 393000,
+    "allocatedMemoryMb" : 773632,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 373000
+  }, {
+    "secondsSinceStart" : 310.622979083,
+    "pendingJobs" : 1416,
+    "activeAssignments" : 331,
+    "finishedJobs" : 8253,
+    "allocatedCpuMillis" : 361500,
+    "allocatedMemoryMb" : 719872,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 354500
+  }, {
+    "secondsSinceStart" : 311.62792675,
+    "pendingJobs" : 1373,
+    "activeAssignments" : 351,
+    "finishedJobs" : 8276,
+    "allocatedCpuMillis" : 386250,
+    "allocatedMemoryMb" : 767744,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367750
+  }, {
+    "secondsSinceStart" : 312.635179125,
+    "pendingJobs" : 1361,
+    "activeAssignments" : 335,
+    "finishedJobs" : 8304,
+    "allocatedCpuMillis" : 372000,
+    "allocatedMemoryMb" : 726784,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366250
+  }, {
+    "secondsSinceStart" : 313.642131666,
+    "pendingJobs" : 1320,
+    "activeAssignments" : 350,
+    "finishedJobs" : 8330,
+    "allocatedCpuMillis" : 390250,
+    "allocatedMemoryMb" : 765440,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371500
+  }, {
+    "secondsSinceStart" : 314.64675175,
+    "pendingJobs" : 1303,
+    "activeAssignments" : 336,
+    "finishedJobs" : 8361,
+    "allocatedCpuMillis" : 370250,
+    "allocatedMemoryMb" : 740608,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 355000
+  }, {
+    "secondsSinceStart" : 315.652464958,
+    "pendingJobs" : 1266,
+    "activeAssignments" : 344,
+    "finishedJobs" : 8390,
+    "allocatedCpuMillis" : 383000,
+    "allocatedMemoryMb" : 763136,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363500
+  }, {
+    "secondsSinceStart" : 316.657308375,
+    "pendingJobs" : 1245,
+    "activeAssignments" : 347,
+    "finishedJobs" : 8408,
+    "allocatedCpuMillis" : 386500,
+    "allocatedMemoryMb" : 767488,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370500
+  }, {
+    "secondsSinceStart" : 317.662653583,
+    "pendingJobs" : 1221,
+    "activeAssignments" : 344,
+    "finishedJobs" : 8435,
+    "allocatedCpuMillis" : 383250,
+    "allocatedMemoryMb" : 762624,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362750
+  }, {
+    "secondsSinceStart" : 318.667635416,
+    "pendingJobs" : 1203,
+    "activeAssignments" : 334,
+    "finishedJobs" : 8463,
+    "allocatedCpuMillis" : 378750,
+    "allocatedMemoryMb" : 739072,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367500
+  }, {
+    "secondsSinceStart" : 319.676304833,
+    "pendingJobs" : 1159,
+    "activeAssignments" : 345,
+    "finishedJobs" : 8496,
+    "allocatedCpuMillis" : 391750,
+    "allocatedMemoryMb" : 774656,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361500
+  }, {
+    "secondsSinceStart" : 320.681865,
+    "pendingJobs" : 1146,
+    "activeAssignments" : 336,
+    "finishedJobs" : 8518,
+    "allocatedCpuMillis" : 379750,
+    "allocatedMemoryMb" : 753408,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369750
+  }, {
+    "secondsSinceStart" : 321.685332833,
+    "pendingJobs" : 1097,
+    "activeAssignments" : 346,
+    "finishedJobs" : 8557,
+    "allocatedCpuMillis" : 392000,
+    "allocatedMemoryMb" : 781824,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 350250
+  }, {
+    "secondsSinceStart" : 322.68946675,
+    "pendingJobs" : 1084,
+    "activeAssignments" : 335,
+    "finishedJobs" : 8581,
+    "allocatedCpuMillis" : 376000,
+    "allocatedMemoryMb" : 755200,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365750
+  }, {
+    "secondsSinceStart" : 323.695563708,
+    "pendingJobs" : 1049,
+    "activeAssignments" : 350,
+    "finishedJobs" : 8601,
+    "allocatedCpuMillis" : 396000,
+    "allocatedMemoryMb" : 786688,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 371750
+  }, {
+    "secondsSinceStart" : 324.702462166,
+    "pendingJobs" : 1032,
+    "activeAssignments" : 339,
+    "finishedJobs" : 8629,
+    "allocatedCpuMillis" : 385000,
+    "allocatedMemoryMb" : 761344,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367250
+  }, {
+    "secondsSinceStart" : 325.7111195,
+    "pendingJobs" : 1001,
+    "activeAssignments" : 345,
+    "finishedJobs" : 8654,
+    "allocatedCpuMillis" : 390000,
+    "allocatedMemoryMb" : 781568,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363250
+  }, {
+    "secondsSinceStart" : 326.718944375,
+    "pendingJobs" : 982,
+    "activeAssignments" : 333,
+    "finishedJobs" : 8685,
+    "allocatedCpuMillis" : 376750,
+    "allocatedMemoryMb" : 749824,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361250
+  }, {
+    "secondsSinceStart" : 327.726837083,
+    "pendingJobs" : 944,
+    "activeAssignments" : 345,
+    "finishedJobs" : 8711,
+    "allocatedCpuMillis" : 389250,
+    "allocatedMemoryMb" : 779008,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370000
+  }, {
+    "secondsSinceStart" : 328.737689083,
+    "pendingJobs" : 930,
+    "activeAssignments" : 330,
+    "finishedJobs" : 8740,
+    "allocatedCpuMillis" : 373000,
+    "allocatedMemoryMb" : 750592,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358500
+  }, {
+    "secondsSinceStart" : 329.742076666,
+    "pendingJobs" : 889,
+    "activeAssignments" : 345,
+    "finishedJobs" : 8766,
+    "allocatedCpuMillis" : 390250,
+    "allocatedMemoryMb" : 783104,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359500
+  }, {
+    "secondsSinceStart" : 330.749420666,
+    "pendingJobs" : 864,
+    "activeAssignments" : 342,
+    "finishedJobs" : 8794,
+    "allocatedCpuMillis" : 387250,
+    "allocatedMemoryMb" : 771584,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 367000
+  }, {
+    "secondsSinceStart" : 331.758027958,
+    "pendingJobs" : 844,
+    "activeAssignments" : 343,
+    "finishedJobs" : 8813,
+    "allocatedCpuMillis" : 390500,
+    "allocatedMemoryMb" : 778752,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370000
+  }, {
+    "secondsSinceStart" : 332.762686208,
+    "pendingJobs" : 822,
+    "activeAssignments" : 327,
+    "finishedJobs" : 8851,
+    "allocatedCpuMillis" : 373750,
+    "allocatedMemoryMb" : 746496,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 349750
+  }, {
+    "secondsSinceStart" : 333.771660208,
+    "pendingJobs" : 781,
+    "activeAssignments" : 341,
+    "finishedJobs" : 8878,
+    "allocatedCpuMillis" : 394000,
+    "allocatedMemoryMb" : 775168,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 369500
+  }, {
+    "secondsSinceStart" : 334.776436541,
+    "pendingJobs" : 751,
+    "activeAssignments" : 338,
+    "finishedJobs" : 8911,
+    "allocatedCpuMillis" : 395000,
+    "allocatedMemoryMb" : 771328,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361500
+  }, {
+    "secondsSinceStart" : 335.781136041,
+    "pendingJobs" : 737,
+    "activeAssignments" : 335,
+    "finishedJobs" : 8928,
+    "allocatedCpuMillis" : 390500,
+    "allocatedMemoryMb" : 765440,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 374250
+  }, {
+    "secondsSinceStart" : 336.786998291,
+    "pendingJobs" : 703,
+    "activeAssignments" : 338,
+    "finishedJobs" : 8959,
+    "allocatedCpuMillis" : 396000,
+    "allocatedMemoryMb" : 772864,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357000
+  }, {
+    "secondsSinceStart" : 337.794514166,
+    "pendingJobs" : 678,
+    "activeAssignments" : 334,
+    "finishedJobs" : 8988,
+    "allocatedCpuMillis" : 391750,
+    "allocatedMemoryMb" : 769024,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361000
+  }, {
+    "secondsSinceStart" : 338.801712291,
+    "pendingJobs" : 656,
+    "activeAssignments" : 335,
+    "finishedJobs" : 9009,
+    "allocatedCpuMillis" : 394500,
+    "allocatedMemoryMb" : 774912,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 370000
+  }, {
+    "secondsSinceStart" : 339.80761325,
+    "pendingJobs" : 644,
+    "activeAssignments" : 326,
+    "finishedJobs" : 9030,
+    "allocatedCpuMillis" : 390000,
+    "allocatedMemoryMb" : 764672,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 376750
+  }, {
+    "secondsSinceStart" : 340.8137885,
+    "pendingJobs" : 612,
+    "activeAssignments" : 329,
+    "finishedJobs" : 9059,
+    "allocatedCpuMillis" : 393750,
+    "allocatedMemoryMb" : 776448,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360750
+  }, {
+    "secondsSinceStart" : 341.819652166,
+    "pendingJobs" : 598,
+    "activeAssignments" : 314,
+    "finishedJobs" : 9088,
+    "allocatedCpuMillis" : 379250,
+    "allocatedMemoryMb" : 742656,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361250
+  }, {
+    "secondsSinceStart" : 342.826984333,
+    "pendingJobs" : 560,
+    "activeAssignments" : 323,
+    "finishedJobs" : 9117,
+    "allocatedCpuMillis" : 393000,
+    "allocatedMemoryMb" : 758016,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 361500
+  }, {
+    "secondsSinceStart" : 343.835261125,
+    "pendingJobs" : 540,
+    "activeAssignments" : 311,
+    "finishedJobs" : 9149,
+    "allocatedCpuMillis" : 378250,
+    "allocatedMemoryMb" : 725248,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 357000
+  }, {
+    "secondsSinceStart" : 344.840101208,
+    "pendingJobs" : 510,
+    "activeAssignments" : 321,
+    "finishedJobs" : 9169,
+    "allocatedCpuMillis" : 393000,
+    "allocatedMemoryMb" : 748288,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365250
+  }, {
+    "secondsSinceStart" : 345.84744125,
+    "pendingJobs" : 495,
+    "activeAssignments" : 321,
+    "finishedJobs" : 9184,
+    "allocatedCpuMillis" : 392000,
+    "allocatedMemoryMb" : 753152,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 374250
+  }, {
+    "secondsSinceStart" : 346.853194833,
+    "pendingJobs" : 475,
+    "activeAssignments" : 318,
+    "finishedJobs" : 9207,
+    "allocatedCpuMillis" : 387000,
+    "allocatedMemoryMb" : 746752,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364500
+  }, {
+    "secondsSinceStart" : 347.861155125,
+    "pendingJobs" : 443,
+    "activeAssignments" : 317,
+    "finishedJobs" : 9240,
+    "allocatedCpuMillis" : 391500,
+    "allocatedMemoryMb" : 746496,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 350750
+  }, {
+    "secondsSinceStart" : 348.865304125,
+    "pendingJobs" : 419,
+    "activeAssignments" : 313,
+    "finishedJobs" : 9268,
+    "allocatedCpuMillis" : 389000,
+    "allocatedMemoryMb" : 731648,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 356750
+  }, {
+    "secondsSinceStart" : 349.871607666,
+    "pendingJobs" : 392,
+    "activeAssignments" : 314,
+    "finishedJobs" : 9294,
+    "allocatedCpuMillis" : 391750,
+    "allocatedMemoryMb" : 736000,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 360750
+  }, {
+    "secondsSinceStart" : 350.876565125,
+    "pendingJobs" : 372,
+    "activeAssignments" : 310,
+    "finishedJobs" : 9318,
+    "allocatedCpuMillis" : 389000,
+    "allocatedMemoryMb" : 721920,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 364000
+  }, {
+    "secondsSinceStart" : 351.883237916,
+    "pendingJobs" : 343,
+    "activeAssignments" : 306,
+    "finishedJobs" : 9351,
+    "allocatedCpuMillis" : 383500,
+    "allocatedMemoryMb" : 719872,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 354500
+  }, {
+    "secondsSinceStart" : 352.8889875,
+    "pendingJobs" : 327,
+    "activeAssignments" : 296,
+    "finishedJobs" : 9377,
+    "allocatedCpuMillis" : 374000,
+    "allocatedMemoryMb" : 702464,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362000
+  }, {
+    "secondsSinceStart" : 353.896409125,
+    "pendingJobs" : 286,
+    "activeAssignments" : 308,
+    "finishedJobs" : 9406,
+    "allocatedCpuMillis" : 387750,
+    "allocatedMemoryMb" : 723456,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 352250
+  }, {
+    "secondsSinceStart" : 354.902332958,
+    "pendingJobs" : 268,
+    "activeAssignments" : 306,
+    "finishedJobs" : 9426,
+    "allocatedCpuMillis" : 386250,
+    "allocatedMemoryMb" : 721920,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 365750
+  }, {
+    "secondsSinceStart" : 355.908886083,
+    "pendingJobs" : 249,
+    "activeAssignments" : 300,
+    "finishedJobs" : 9451,
+    "allocatedCpuMillis" : 379750,
+    "allocatedMemoryMb" : 695552,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 355250
+  }, {
+    "secondsSinceStart" : 356.914107416,
+    "pendingJobs" : 222,
+    "activeAssignments" : 307,
+    "finishedJobs" : 9471,
+    "allocatedCpuMillis" : 388500,
+    "allocatedMemoryMb" : 706048,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359750
+  }, {
+    "secondsSinceStart" : 357.918916416,
+    "pendingJobs" : 196,
+    "activeAssignments" : 305,
+    "finishedJobs" : 9499,
+    "allocatedCpuMillis" : 389500,
+    "allocatedMemoryMb" : 699136,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 354250
+  }, {
+    "secondsSinceStart" : 358.923891541,
+    "pendingJobs" : 184,
+    "activeAssignments" : 292,
+    "finishedJobs" : 9524,
+    "allocatedCpuMillis" : 375750,
+    "allocatedMemoryMb" : 668928,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358750
+  }, {
+    "secondsSinceStart" : 359.928084458,
+    "pendingJobs" : 145,
+    "activeAssignments" : 302,
+    "finishedJobs" : 9553,
+    "allocatedCpuMillis" : 390500,
+    "allocatedMemoryMb" : 691456,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 353250
+  }, {
+    "secondsSinceStart" : 360.933133583,
+    "pendingJobs" : 128,
+    "activeAssignments" : 298,
+    "finishedJobs" : 9574,
+    "allocatedCpuMillis" : 389750,
+    "allocatedMemoryMb" : 677888,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366750
+  }, {
+    "secondsSinceStart" : 361.940965791,
+    "pendingJobs" : 107,
+    "activeAssignments" : 298,
+    "finishedJobs" : 9595,
+    "allocatedCpuMillis" : 387000,
+    "allocatedMemoryMb" : 670976,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 366500
+  }, {
+    "secondsSinceStart" : 362.948994041,
+    "pendingJobs" : 94,
+    "activeAssignments" : 290,
+    "finishedJobs" : 9616,
+    "allocatedCpuMillis" : 377000,
+    "allocatedMemoryMb" : 648960,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 363000
+  }, {
+    "secondsSinceStart" : 363.956186625,
+    "pendingJobs" : 61,
+    "activeAssignments" : 298,
+    "finishedJobs" : 9641,
+    "allocatedCpuMillis" : 388750,
+    "allocatedMemoryMb" : 670208,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 359750
+  }, {
+    "secondsSinceStart" : 364.962917958,
+    "pendingJobs" : 39,
+    "activeAssignments" : 293,
+    "finishedJobs" : 9668,
+    "allocatedCpuMillis" : 389000,
+    "allocatedMemoryMb" : 646144,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 358000
+  }, {
+    "secondsSinceStart" : 365.967256333,
+    "pendingJobs" : 29,
+    "activeAssignments" : 284,
+    "finishedJobs" : 9687,
+    "allocatedCpuMillis" : 377500,
+    "allocatedMemoryMb" : 628736,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 362500
+  }, {
+    "secondsSinceStart" : 366.973019333,
+    "pendingJobs" : 4,
+    "activeAssignments" : 281,
+    "finishedJobs" : 9715,
+    "allocatedCpuMillis" : 382250,
+    "allocatedMemoryMb" : 620544,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 349500
+  }, {
+    "secondsSinceStart" : 367.977162416,
+    "pendingJobs" : 0,
+    "activeAssignments" : 264,
+    "finishedJobs" : 9736,
+    "allocatedCpuMillis" : 361250,
+    "allocatedMemoryMb" : 599040,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 354500
+  }, {
+    "secondsSinceStart" : 368.982008625,
+    "pendingJobs" : 0,
+    "activeAssignments" : 250,
+    "finishedJobs" : 9750,
+    "allocatedCpuMillis" : 339750,
+    "allocatedMemoryMb" : 565504,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 339750
+  }, {
+    "secondsSinceStart" : 369.990349125,
+    "pendingJobs" : 0,
+    "activeAssignments" : 212,
+    "finishedJobs" : 9788,
+    "allocatedCpuMillis" : 288250,
+    "allocatedMemoryMb" : 486400,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 288250
+  }, {
+    "secondsSinceStart" : 370.994076875,
+    "pendingJobs" : 0,
+    "activeAssignments" : 192,
+    "finishedJobs" : 9808,
+    "allocatedCpuMillis" : 257000,
+    "allocatedMemoryMb" : 439808,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 257000
+  }, {
+    "secondsSinceStart" : 372.000022458,
+    "pendingJobs" : 0,
+    "activeAssignments" : 170,
+    "finishedJobs" : 9830,
+    "allocatedCpuMillis" : 230250,
+    "allocatedMemoryMb" : 399872,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 230250
+  }, {
+    "secondsSinceStart" : 373.005632333,
+    "pendingJobs" : 0,
+    "activeAssignments" : 154,
+    "finishedJobs" : 9846,
+    "allocatedCpuMillis" : 210500,
+    "allocatedMemoryMb" : 360192,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 210500
+  }, {
+    "secondsSinceStart" : 374.012933041,
+    "pendingJobs" : 0,
+    "activeAssignments" : 139,
+    "finishedJobs" : 9861,
+    "allocatedCpuMillis" : 189000,
+    "allocatedMemoryMb" : 316672,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 189000
+  }, {
+    "secondsSinceStart" : 375.016942166,
+    "pendingJobs" : 0,
+    "activeAssignments" : 123,
+    "finishedJobs" : 9877,
+    "allocatedCpuMillis" : 168250,
+    "allocatedMemoryMb" : 280576,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 168250
+  }, {
+    "secondsSinceStart" : 376.021413166,
+    "pendingJobs" : 0,
+    "activeAssignments" : 106,
+    "finishedJobs" : 9894,
+    "allocatedCpuMillis" : 145250,
+    "allocatedMemoryMb" : 242432,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 145250
+  }, {
+    "secondsSinceStart" : 377.029874875,
+    "pendingJobs" : 0,
+    "activeAssignments" : 79,
+    "finishedJobs" : 9921,
+    "allocatedCpuMillis" : 108500,
+    "allocatedMemoryMb" : 178176,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 108500
+  }, {
+    "secondsSinceStart" : 378.064087041,
+    "pendingJobs" : 0,
+    "activeAssignments" : 68,
+    "finishedJobs" : 9932,
+    "allocatedCpuMillis" : 94250,
+    "allocatedMemoryMb" : 157952,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 94250
+  }, {
+    "secondsSinceStart" : 379.0717855,
+    "pendingJobs" : 0,
+    "activeAssignments" : 50,
+    "finishedJobs" : 9950,
+    "allocatedCpuMillis" : 71750,
+    "allocatedMemoryMb" : 113152,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 71750
+  }, {
+    "secondsSinceStart" : 380.077709416,
+    "pendingJobs" : 0,
+    "activeAssignments" : 34,
+    "finishedJobs" : 9966,
+    "allocatedCpuMillis" : 51500,
+    "allocatedMemoryMb" : 74752,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 51500
+  }, {
+    "secondsSinceStart" : 381.082785833,
+    "pendingJobs" : 0,
+    "activeAssignments" : 24,
+    "finishedJobs" : 9976,
+    "allocatedCpuMillis" : 36250,
+    "allocatedMemoryMb" : 51456,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 36250
+  }, {
+    "secondsSinceStart" : 382.087561833,
+    "pendingJobs" : 0,
+    "activeAssignments" : 18,
+    "finishedJobs" : 9982,
+    "allocatedCpuMillis" : 26750,
+    "allocatedMemoryMb" : 38144,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 26750
+  }, {
+    "secondsSinceStart" : 383.13771,
+    "pendingJobs" : 0,
+    "activeAssignments" : 12,
+    "finishedJobs" : 9988,
+    "allocatedCpuMillis" : 19500,
+    "allocatedMemoryMb" : 27648,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 19500
+  }, {
+    "secondsSinceStart" : 384.146792625,
+    "pendingJobs" : 0,
+    "activeAssignments" : 6,
+    "finishedJobs" : 9994,
+    "allocatedCpuMillis" : 10000,
+    "allocatedMemoryMb" : 14848,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 10000
+  }, {
+    "secondsSinceStart" : 385.150469125,
+    "pendingJobs" : 0,
+    "activeAssignments" : 4,
+    "finishedJobs" : 9996,
+    "allocatedCpuMillis" : 6500,
+    "allocatedMemoryMb" : 13312,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 6500
+  }, {
+    "secondsSinceStart" : 386.15723075,
+    "pendingJobs" : 0,
+    "activeAssignments" : 1,
+    "finishedJobs" : 9999,
+    "allocatedCpuMillis" : 1500,
+    "allocatedMemoryMb" : 3840,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 1500
+  }, {
+    "secondsSinceStart" : 387.162284375,
+    "pendingJobs" : 0,
+    "activeAssignments" : 1,
+    "finishedJobs" : 9999,
+    "allocatedCpuMillis" : 1500,
+    "allocatedMemoryMb" : 3840,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 1500
+  }, {
+    "secondsSinceStart" : 388.169011291,
+    "pendingJobs" : 0,
+    "activeAssignments" : 0,
+    "finishedJobs" : 10000,
+    "allocatedCpuMillis" : 0,
+    "allocatedMemoryMb" : 0,
+    "cpuCapacityMillis" : 400000,
+    "memoryCapacityMb" : 819200,
+    "workerReportedUsedCpuMillis" : 0
+  } ]
+}
