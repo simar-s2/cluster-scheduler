@@ -85,8 +85,8 @@ public final class PackingBenchmark {
             """;
 
     public static void main(String[] args) throws Exception {
-        int workerContainers = Settings.number("WORKER_CONTAINERS", 50);
-        int nodesPerContainer = Settings.number("NODES_PER_CONTAINER", 2);
+        int workerContainers = Settings.number("WORKER_CONTAINERS", 100);
+        int nodesPerContainer = Settings.number("NODES_PER_CONTAINER", 1);
         Config config = new Config(
                 workerContainers, nodesPerContainer, workerContainers * nodesPerContainer, 4_000, 8_192,
                 Settings.number("JOBS", 10_000),
