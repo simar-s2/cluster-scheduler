@@ -26,6 +26,10 @@ message AssignTaskRequest {
   // request. The worker rejects a request whose epoch is lower than the
   // highest it has seen, because that sender has since been replaced.
   int64 leader_epoch = 5;
+  // The node this assignment is for. Addresses get reused: a new worker can
+  // start on the IP of a dead one. Checking the ID stops the new worker from
+  // starting a task meant for the node it replaced.
+  string node_id = 6;
 }
 
 message AssignTaskResponse {
@@ -37,6 +41,8 @@ message AssignTaskResponse {
     RESULT_DUPLICATE = 2;
     // Rejected because leader_epoch is older than one the worker has seen.
     RESULT_STALE_EPOCH = 3;
+    // Rejected because node_id is not this worker's current node ID.
+    RESULT_WRONG_NODE = 4;
   }
   Result result = 1;
 }
