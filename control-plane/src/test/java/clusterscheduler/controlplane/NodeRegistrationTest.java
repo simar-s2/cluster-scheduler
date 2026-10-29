@@ -4,8 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import clusterscheduler.controlplane.database.Database;
+import clusterscheduler.proto.ControlPlaneGrpc;
+import clusterscheduler.proto.RegisterNodeRequest;
+import clusterscheduler.proto.Resources;
 import clusterscheduler.worker.WorkerConfig;
 import clusterscheduler.worker.WorkerNode;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -79,6 +84,36 @@ class NodeRegistrationTest {
         Eventually.waitUntil("the worker registers again", Duration.ofSeconds(5),
                 () -> worker.nodeId() != null && !worker.nodeId().equals(firstNodeId));
         assertNotEquals(firstNodeId, worker.nodeId());
+    }
+
+    @Test
+    void retryingARegistrationWithTheSameIdCreatesOneNode() {
+        ManagedChannel channel = ManagedChannelBuilder.forTarget("127.0.0.1:" + controlPlane.grpcPort())
+                .usePlaintext()
+                .build();
+        try {
+            RegisterNodeRequest request = RegisterNodeRequest.newBuilder()
+                    .setRegistrationId("retried-registration")
+                    .setAddress("127.0.0.1:1")
+                    .setCapacity(Resources.newBuilder().setCpuMillis(1_000).setMemoryMb(1_000))
+                    .build();
+            // As if the first response was lost and the worker tried again.
+            String first = ControlPlaneGrpc.newBlockingStub(channel).registerNode(request).getNodeId();
+            String second = ControlPlaneGrpc.newBlockingStub(channel).registerNode(request).getNodeId();
+
+            assertEquals(first, second);
+            long nodes = database.inTransaction(connection -> {
+                try (PreparedStatement query = connection.prepareStatement(
+                        "SELECT count(*) FROM nodes WHERE node_id = 'retried-registration'");
+                        ResultSet row = query.executeQuery()) {
+                    row.next();
+                    return row.getLong(1);
+                }
+            });
+            assertEquals(1, nodes);
+        } finally {
+            channel.shutdownNow();
+        }
     }
 
     private Timestamp lastHeartbeatAt(String nodeId) {
