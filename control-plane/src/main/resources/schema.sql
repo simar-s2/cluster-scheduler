@@ -11,10 +11,15 @@ CREATE TABLE IF NOT EXISTS nodes (
     -- What the worker said in its latest heartbeat.
     reported_free_cpu_millis BIGINT      NOT NULL,
     reported_free_memory_mb  BIGINT      NOT NULL,
+    -- ALIVE until the leader sees no heartbeat for longer than the timeout.
+    -- A DEAD node never comes back; its worker registers as a new node.
+    status                   TEXT        NOT NULL DEFAULT 'ALIVE'
+                                         CHECK (status IN ('ALIVE', 'DEAD')),
     registered_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     -- Database time, never a replica's clock, so clock skew between replicas
     -- cannot make a node look dead.
-    last_heartbeat_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+    last_heartbeat_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    marked_dead_at           TIMESTAMPTZ
 );
 
 -- Desired state: every job a client has submitted. A PENDING job is waiting
@@ -36,13 +41,14 @@ CREATE INDEX IF NOT EXISTS pending_jobs_in_queue_order
     ON jobs (submitted_at, job_id) WHERE state = 'PENDING';
 
 -- Every placement of a job on a node, kept forever as history. ASSIGNED means
--- the leader saved it, RUNNING means the node confirmed it in a heartbeat.
+-- the leader saved it, RUNNING means the node confirmed it in a heartbeat, and
+-- LOST means the node died first, so the job went back to the queue.
 CREATE TABLE IF NOT EXISTS assignments (
     assignment_id TEXT        PRIMARY KEY,
     job_id        TEXT        NOT NULL REFERENCES jobs (job_id),
     node_id       TEXT        NOT NULL REFERENCES nodes (node_id),
     state         TEXT        NOT NULL DEFAULT 'ASSIGNED'
-                              CHECK (state IN ('ASSIGNED', 'RUNNING', 'FINISHED')),
+                              CHECK (state IN ('ASSIGNED', 'RUNNING', 'FINISHED', 'LOST')),
     assigned_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
     running_at    TIMESTAMPTZ,
     ended_at      TIMESTAMPTZ
@@ -56,3 +62,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS one_active_assignment_per_job
 -- Used to add up what is placed on each node.
 CREATE INDEX IF NOT EXISTS active_assignments_by_node
     ON assignments (node_id) WHERE state IN ('ASSIGNED', 'RUNNING');
+
+-- Assignments no worker has confirmed yet, which the reconcile loop resends.
+CREATE INDEX IF NOT EXISTS unconfirmed_assignments
+    ON assignments (assigned_at) WHERE state = 'ASSIGNED';
