@@ -1,7 +1,7 @@
 package clusterscheduler.controlplane.scheduling;
 
-import clusterscheduler.controlplane.database.Database;
 import clusterscheduler.controlplane.delivery.AssignmentSender;
+import clusterscheduler.controlplane.leadership.FencedTransactions;
 import clusterscheduler.controlplane.state.Assignment;
 import clusterscheduler.controlplane.state.AssignmentRepository;
 import clusterscheduler.controlplane.state.JobRepository;
@@ -20,11 +20,15 @@ import org.slf4j.LoggerFactory;
  * Saving comes before sending. If this replica dies between the two, the
  * assignments are already in PostgreSQL and get resent by whoever leads
  * next. The other order could start a task that no one has a record of.
+ *
+ * The reads are not fenced, but the save is. If this replica stopped being
+ * leader while it was deciding, the save is rejected and nothing it decided
+ * takes effect.
  */
 public final class SchedulingLoop {
     private static final Logger log = LoggerFactory.getLogger(SchedulingLoop.class);
 
-    private final Database database;
+    private final FencedTransactions fencedTransactions;
     private final JobRepository jobRepository;
     private final NodeRepository nodeRepository;
     private final AssignmentRepository assignmentRepository;
@@ -33,13 +37,13 @@ public final class SchedulingLoop {
     private final int batchSize;
 
     public SchedulingLoop(
-            Database database,
+            FencedTransactions fencedTransactions,
             JobRepository jobRepository,
             NodeRepository nodeRepository,
             AssignmentRepository assignmentRepository,
             AssignmentSender assignmentSender,
             int batchSize) {
-        this.database = database;
+        this.fencedTransactions = fencedTransactions;
         this.jobRepository = jobRepository;
         this.nodeRepository = nodeRepository;
         this.assignmentRepository = assignmentRepository;
@@ -59,8 +63,8 @@ public final class SchedulingLoop {
             return;
         }
         List<Assignment> newAssignments = placements.stream().map(SchedulingLoop::toAssignment).toList();
-        List<Assignment> saved = database.inTransaction(
-                connection -> assignmentRepository.saveNew(connection, newAssignments, epoch));
+        List<Assignment> saved = fencedTransactions.run(
+                epoch, connection -> assignmentRepository.saveNew(connection, newAssignments, epoch));
         log.debug("Placed {} of {} pending jobs", saved.size(), pendingJobs.size());
         assignmentSender.sendAll(saved, epoch);
     }

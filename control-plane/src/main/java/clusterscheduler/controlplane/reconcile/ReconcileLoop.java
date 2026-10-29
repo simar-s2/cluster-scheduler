@@ -2,6 +2,7 @@ package clusterscheduler.controlplane.reconcile;
 
 import clusterscheduler.controlplane.database.Database;
 import clusterscheduler.controlplane.delivery.AssignmentSender;
+import clusterscheduler.controlplane.leadership.FencedTransactions;
 import clusterscheduler.controlplane.state.Assignment;
 import clusterscheduler.controlplane.state.AssignmentRepository;
 import clusterscheduler.controlplane.state.DeadNodes;
@@ -25,12 +26,17 @@ import org.slf4j.LoggerFactory;
  *
  * Each pass looks at the whole current state rather than reacting to single
  * events, so a missed pass or a lost message is simply fixed by the next one.
+ *
+ * Declaring nodes dead is a decision, so it runs in a fenced transaction.
+ * Without the fence, a replaced leader waking from a pause could declare
+ * nodes dead with heartbeat data it read before the pause.
  */
 public final class ReconcileLoop {
     private static final Logger log = LoggerFactory.getLogger(ReconcileLoop.class);
     private static final int MAX_RESENDS_PER_PASS = 1_000;
 
     private final Database database;
+    private final FencedTransactions fencedTransactions;
     private final NodeRepository nodeRepository;
     private final AssignmentRepository assignmentRepository;
     private final AssignmentSender assignmentSender;
@@ -39,12 +45,14 @@ public final class ReconcileLoop {
 
     public ReconcileLoop(
             Database database,
+            FencedTransactions fencedTransactions,
             NodeRepository nodeRepository,
             AssignmentRepository assignmentRepository,
             AssignmentSender assignmentSender,
             long heartbeatTimeoutMillis,
             long resendAfterMillis) {
         this.database = database;
+        this.fencedTransactions = fencedTransactions;
         this.nodeRepository = nodeRepository;
         this.assignmentRepository = assignmentRepository;
         this.assignmentSender = assignmentSender;
@@ -54,13 +62,13 @@ public final class ReconcileLoop {
 
     /** Runs one pass as the leader of the given epoch. */
     public void runOnce(long epoch) {
-        handleDeadNodes();
+        handleDeadNodes(epoch);
         resendUnconfirmedAssignments(epoch);
     }
 
-    private void handleDeadNodes() {
-        DeadNodes deadNodes = database.inTransaction(
-                connection -> nodeRepository.markExpiredNodesDead(connection, heartbeatTimeoutMillis));
+    private void handleDeadNodes(long epoch) {
+        DeadNodes deadNodes = fencedTransactions.run(
+                epoch, connection -> nodeRepository.markExpiredNodesDead(connection, heartbeatTimeoutMillis));
         if (deadNodes.isEmpty()) {
             return;
         }

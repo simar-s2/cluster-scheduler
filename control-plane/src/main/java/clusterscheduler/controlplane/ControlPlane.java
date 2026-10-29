@@ -3,9 +3,11 @@ package clusterscheduler.controlplane;
 import clusterscheduler.controlplane.database.Database;
 import clusterscheduler.controlplane.database.SchemaInitializer;
 import clusterscheduler.controlplane.delivery.AssignmentSender;
+import clusterscheduler.controlplane.leadership.FencedTransactions;
 import clusterscheduler.controlplane.leadership.LeaderElector;
 import clusterscheduler.controlplane.leadership.Leadership;
 import clusterscheduler.controlplane.leadership.LeaseRepository;
+import clusterscheduler.controlplane.leadership.StaleEpochException;
 import clusterscheduler.controlplane.reconcile.ReconcileLoop;
 import clusterscheduler.controlplane.scheduling.SchedulingLoop;
 import clusterscheduler.controlplane.state.AssignmentRepository;
@@ -70,11 +72,12 @@ public final class ControlPlane implements AutoCloseable {
         ControlPlane controlPlane =
                 new ControlPlane(database, grpcServer, assignmentSender, leadership, leaderElector);
 
+        FencedTransactions fencedTransactions = new FencedTransactions(database);
         SchedulingLoop schedulingLoop = new SchedulingLoop(
-                database, jobRepository, nodeRepository, assignmentRepository, assignmentSender,
+                fencedTransactions, jobRepository, nodeRepository, assignmentRepository, assignmentSender,
                 config.schedulingBatchSize());
         ReconcileLoop reconcileLoop = new ReconcileLoop(
-                database, nodeRepository, assignmentRepository, assignmentSender,
+                database, fencedTransactions, nodeRepository, assignmentRepository, assignmentSender,
                 config.heartbeatTimeoutMillis(), config.resendAfterMillis());
         controlPlane.repeatWhileLeader("scheduling", schedulingLoop::runOnce, config.schedulingIntervalMillis());
         controlPlane.repeatWhileLeader("reconcile", reconcileLoop::runOnce, config.reconcileIntervalMillis());
@@ -114,6 +117,11 @@ public final class ControlPlane implements AutoCloseable {
             }
             try {
                 step.accept(epoch.getAsLong());
+            } catch (StaleEpochException fencedOut) {
+                // PostgreSQL refused the write: a newer leader exists. Stop
+                // acting at once instead of waiting for the local deadline.
+                log.warn("FENCED: {} write rejected, {}; stepping down", stepName, fencedOut.getMessage());
+                leadership.stepDown(fencedOut.staleEpoch());
             } catch (RuntimeException failure) {
                 log.warn("{} step failed: {}", stepName, failure.getMessage());
             }
