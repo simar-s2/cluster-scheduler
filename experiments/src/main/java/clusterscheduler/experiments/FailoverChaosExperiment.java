@@ -40,7 +40,17 @@ public final class FailoverChaosExperiment {
             long jobsRunOnTwoNodesAtOnceInWorkerLogs,
             long assignmentsStartedTwiceInWorkerLogs) {}
 
-    record Fencing(long highestEpoch, long controlPlaneWritesRejected, long workerStaleEpochRejections) {}
+    /**
+     * How often each safety mechanism actually fired. A paused leader can be
+     * stopped two ways: its write reaches PostgreSQL and is rejected for its
+     * epoch, or it was frozen inside a transaction and PostgreSQL ended the
+     * session (idle_in_transaction_session_timeout) before it woke up.
+     */
+    record Fencing(
+            long highestEpoch,
+            long controlPlaneWritesRejected,
+            long controlPlaneTransactionsEndedByIdleTimeout,
+            long workerStaleEpochRejections) {}
 
     record Results(
             String experiment,
@@ -108,6 +118,7 @@ public final class FailoverChaosExperiment {
             Waits.sleep(2_000);
 
             WorkerLogCheck.Findings workerFindings = WorkerLogCheck.check(ExecutionLogs.readAll());
+            String replicaLogs = docker.logs(REPLICAS.toArray(String[]::new));
             long finished = database.queryNumber(finishedQuery, (Object) acceptedIds);
             Results results = new Results(
                     "failover-chaos",
@@ -122,7 +133,8 @@ public final class FailoverChaosExperiment {
                             workerFindings.assignmentsStartedTwice()),
                     new Fencing(
                             database.readLease().epoch(),
-                            countLines(docker.logs(REPLICAS.toArray(String[]::new)), "FENCED:"),
+                            countLines(replicaLogs, "FENCED:"),
+                            countLines(replicaLogs, "idle-in-transaction timeout"),
                             workerFindings.staleEpochRejections()),
                     database.queryNumber("SELECT count(*) FROM nodes WHERE status = 'DEAD'"));
             log.info("Wrote {}", ResultsFile.write("failover-chaos", results));

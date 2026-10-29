@@ -1,0 +1,42 @@
+{
+  "experiment" : "failover-chaos",
+  "finishedAt" : "2026-10-29T21:44:14.584920Z",
+  "config" : {
+    "failovers" : 4,
+    "workers" : 10,
+    "nodeCpuMillis" : 4000,
+    "nodeMemoryMb" : 8192,
+    "jobsPerSecond" : 20
+  },
+  "failovers" : {
+    "total" : 4,
+    "byKill" : 2,
+    "byPause" : 2,
+    "millisUntilNewLeader" : {
+      "count" : 4,
+      "min" : 1328.0,
+      "median" : 1332.0,
+      "p99" : 1900.0,
+      "max" : 1900.0,
+      "mean" : 1605.25
+    }
+  },
+  "jobs" : {
+    "accepted" : 270,
+    "notAccepted" : 0,
+    "finished" : 270,
+    "acceptedButNeverFinished" : 0
+  },
+  "doublePlacements" : {
+    "jobsWithOverlappingActiveAssignmentsInDatabase" : 0,
+    "jobsAssignedToMoreThanOneNodeInDatabase" : 0,
+    "jobsRunOnTwoNodesAtOnceInWorkerLogs" : 0,
+    "assignmentsStartedTwiceInWorkerLogs" : 0
+  },
+  "fencing" : {
+    "highestEpoch" : 5,
+    "controlPlaneWritesRejected" : 0,
+    "workerStaleEpochRejections" : 0
+  },
+  "nodesDeclaredDead" : 0
+}
