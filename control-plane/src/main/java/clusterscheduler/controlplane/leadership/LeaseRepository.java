@@ -1,16 +1,25 @@
 package clusterscheduler.controlplane.leadership;
 
 import clusterscheduler.controlplane.database.Database;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.OptionalLong;
 
 /**
  * Reads and writes the leader lease row. Every time comparison uses the
  * database clock (now()), so replicas with skewed clocks still agree on
  * whether the lease has expired.
+ *
+ * Writes to the lease row wait for fenced transactions to finish (they hold
+ * a shared lock on it). Each write gives up after a short lock timeout, so
+ * the election thread retries on its next tick instead of hanging.
  */
 public final class LeaseRepository {
+    private static final String LOCK_TIMEOUT = "500ms";
+
     private final Database database;
 
     public LeaseRepository(Database database) {
@@ -27,6 +36,7 @@ public final class LeaseRepository {
      */
     public OptionalLong tryAcquire(String replicaId, long leaseDurationMillis) {
         return database.inTransaction(connection -> {
+            limitLockWait(connection);
             String sql = """
                     UPDATE leader_lease
                     SET holder = ?, epoch = epoch + 1, expires_at = now() + ? * interval '1 millisecond'
@@ -54,6 +64,7 @@ public final class LeaseRepository {
      */
     public boolean renew(String replicaId, long epoch, long leaseDurationMillis) {
         return database.inTransaction(connection -> {
+            limitLockWait(connection);
             String sql = """
                     UPDATE leader_lease
                     SET expires_at = now() + ? * interval '1 millisecond'
@@ -66,5 +77,12 @@ public final class LeaseRepository {
                 return update.executeUpdate() == 1;
             }
         });
+    }
+
+    /** SET LOCAL lasts until the end of this transaction only. */
+    private static void limitLockWait(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("SET LOCAL lock_timeout = '" + LOCK_TIMEOUT + "'");
+        }
     }
 }
