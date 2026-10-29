@@ -15,7 +15,8 @@ public record WorkerConfig(
         long cpuCapacityMillis,
         long memoryCapacityMb,
         long heartbeatIntervalMillis,
-        String executionLogDirectory) {
+        String executionLogDirectory,
+        int nodesPerProcess) {
 
     /**
      * Reads the settings from a map of variables, such as System.getenv().
@@ -34,7 +35,16 @@ public record WorkerConfig(
                 settings.number("MEMORY_CAPACITY_MB", 8_192),
                 settings.number("HEARTBEAT_INTERVAL_MILLIS", 1_000),
                 // Empty means no execution log.
-                settings.text("EXECUTION_LOG_DIR", ""));
+                settings.text("EXECUTION_LOG_DIR", ""),
+                // More than 1 runs several independent nodes in one JVM, on
+                // consecutive ports. Only used to fit 100 nodes on a laptop.
+                (int) settings.number("NODES_PER_PROCESS", 1));
+    }
+
+    /** The settings for the n-th node in this process: the same, except for the port. */
+    public WorkerConfig forNodeNumber(int nodeNumber) {
+        return new WorkerConfig(controlPlaneAddresses, advertisedHost, grpcBindHost, grpcPort + nodeNumber,
+                cpuCapacityMillis, memoryCapacityMb, heartbeatIntervalMillis, executionLogDirectory, 1);
     }
 
     private record Settings(Map<String, String> variables) {
