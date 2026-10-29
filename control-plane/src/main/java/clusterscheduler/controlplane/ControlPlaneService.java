@@ -45,10 +45,13 @@ final class ControlPlaneService extends ControlPlaneGrpc.ControlPlaneImplBase {
     @Override
     public void registerNode(RegisterNodeRequest request, StreamObserver<RegisterNodeResponse> responseObserver) {
         respond(responseObserver, () -> {
+            requireThat(!request.getRegistrationId().isBlank(), "registration_id is required");
             requireThat(!request.getAddress().isBlank(), "address is required");
             requireThat(request.getCapacity().getCpuMillis() > 0, "capacity.cpu_millis must be positive");
             requireThat(request.getCapacity().getMemoryMb() > 0, "capacity.memory_mb must be positive");
-            String nodeId = nodeRepository.register(
+            String nodeId = request.getRegistrationId();
+            nodeRepository.register(
+                    nodeId,
                     request.getAddress(),
                     request.getCapacity().getCpuMillis(),
                     request.getCapacity().getMemoryMb());

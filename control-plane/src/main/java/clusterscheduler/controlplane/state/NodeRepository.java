@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /** Reads and writes the nodes table. */
 public final class NodeRepository {
@@ -17,14 +16,17 @@ public final class NodeRepository {
         this.database = database;
     }
 
-    /** Adds a node and returns its new ID. Every registration is a new node. */
-    public String register(String address, long cpuCapacityMillis, long memoryCapacityMb) {
-        String nodeId = UUID.randomUUID().toString();
+    /**
+     * Adds a node under the worker's registration ID. Registering the same ID
+     * again changes nothing, so a worker can retry when a response is lost.
+     */
+    public void register(String nodeId, String address, long cpuCapacityMillis, long memoryCapacityMb) {
         database.inTransaction(connection -> {
             String sql = """
                     INSERT INTO nodes (node_id, address, cpu_capacity_millis, memory_capacity_mb,
                                        reported_free_cpu_millis, reported_free_memory_mb)
                     VALUES (?, ?, ?, ?, ?, ?)
+                    ON CONFLICT (node_id) DO NOTHING
                     """;
             try (PreparedStatement insert = connection.prepareStatement(sql)) {
                 insert.setString(1, nodeId);
@@ -37,7 +39,6 @@ public final class NodeRepository {
             }
             return null;
         });
-        return nodeId;
     }
 
     /**
