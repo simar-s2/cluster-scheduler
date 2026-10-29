@@ -1,0 +1,58 @@
+{
+  "experiment" : "node-failure",
+  "finishedAt" : "2026-10-29T22:01:47.665851Z",
+  "config" : {
+    "workers" : 10,
+    "trials" : 5,
+    "jobs" : 40,
+    "jobCpuMillis" : 500,
+    "jobMemoryMb" : 512,
+    "heartbeatIntervalMillis" : 1000,
+    "heartbeatTimeoutMillis" : 5000,
+    "reconcileIntervalMillis" : 1000,
+    "clockStartsWhen" : "when docker reports the container killed"
+  },
+  "trials" : [ {
+    "trial" : 1,
+    "tasksOnKilledNode" : 8,
+    "millisUntilDeclaredDead" : 4642,
+    "millisUntilAllTasksRunningElsewhere" : 5516
+  }, {
+    "trial" : 2,
+    "tasksOnKilledNode" : 8,
+    "millisUntilDeclaredDead" : 4657,
+    "millisUntilAllTasksRunningElsewhere" : 5401
+  }, {
+    "trial" : 3,
+    "tasksOnKilledNode" : 8,
+    "millisUntilDeclaredDead" : 4616,
+    "millisUntilAllTasksRunningElsewhere" : 5480
+  }, {
+    "trial" : 4,
+    "tasksOnKilledNode" : 8,
+    "millisUntilDeclaredDead" : 4401,
+    "millisUntilAllTasksRunningElsewhere" : 5013
+  }, {
+    "trial" : 5,
+    "tasksOnKilledNode" : 8,
+    "millisUntilDeclaredDead" : 4591,
+    "millisUntilAllTasksRunningElsewhere" : 4919
+  } ],
+  "millisUntilDeclaredDead" : {
+    "count" : 5,
+    "min" : 4401.0,
+    "median" : 4616.0,
+    "p99" : 4657.0,
+    "max" : 4657.0,
+    "mean" : 4581.4
+  },
+  "millisUntilAllTasksRunningElsewhere" : {
+    "count" : 5,
+    "min" : 4919.0,
+    "median" : 5401.0,
+    "p99" : 5516.0,
+    "max" : 5516.0,
+    "mean" : 5265.8
+  },
+  "jobsWithOverlappingActiveAssignmentsInDatabase" : 0
+}
