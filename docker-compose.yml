@@ -36,7 +36,10 @@ services:
     environment:
       REPLICA_ID: control-plane-1
       DATABASE_URL: jdbc:postgresql://postgres:5432/scheduler
+      JAVA_OPTS: "-Xmx256m"
     ports:
+      # gRPC for job clients at localhost:9091
+      - "127.0.0.1:9091:9090"
       # Prometheus metrics at http://localhost:8081/metrics
       - "127.0.0.1:8081:8080"
 
@@ -45,7 +48,10 @@ services:
     environment:
       REPLICA_ID: control-plane-2
       DATABASE_URL: jdbc:postgresql://postgres:5432/scheduler
+      JAVA_OPTS: "-Xmx256m"
     ports:
+      # gRPC for job clients at localhost:9092
+      - "127.0.0.1:9092:9090"
       # Prometheus metrics at http://localhost:8082/metrics
       - "127.0.0.1:8082:8080"
 
@@ -54,7 +60,10 @@ services:
     environment:
       REPLICA_ID: control-plane-3
       DATABASE_URL: jdbc:postgresql://postgres:5432/scheduler
+      JAVA_OPTS: "-Xmx256m"
     ports:
+      # gRPC for job clients at localhost:9093
+      - "127.0.0.1:9093:9090"
       # Prometheus metrics at http://localhost:8083/metrics
       - "127.0.0.1:8083:8080"
 
@@ -68,6 +77,19 @@ services:
       CONTROL_PLANE_ADDRESSES: control-plane-1:9090,control-plane-2:9090,control-plane-3:9090
       CPU_CAPACITY_MILLIS: 4000
       MEMORY_CAPACITY_MB: 8192
+      NODES_PER_PROCESS: ${NODES_PER_PROCESS:-1}
+      EXECUTION_LOG_DIR: /var/log/worker
+      # Small heap and few threads: a worker holds almost no data, and 100 of
+      # them have to fit on a laptop. This brings one down to about 43 MB.
+      JAVA_OPTS: >-
+        -Xms8m -Xmx24m -Xss256k -XX:+UseSerialGC
+        -XX:TieredStopAtLevel=1 -XX:CICompilerCount=1 -XX:ReservedCodeCacheSize=12m
+        -XX:MaxMetaspaceSize=40m -XX:MaxDirectMemorySize=8m -XX:-UsePerfData
+        -Dio.grpc.netty.shaded.io.netty.eventLoopThreads=2
+        -Dio.grpc.netty.shaded.io.netty.allocator.type=unpooled
+    volumes:
+      # Every worker appends what it ran here; the experiments check these files.
+      - ./build/worker-logs:/var/log/worker
     depends_on:
       - control-plane-1
       - control-plane-2
