@@ -10,16 +10,19 @@ import java.util.List;
 public final class WorkerNode implements AutoCloseable {
     private final Server grpcServer;
     private final TaskRunner taskRunner;
+    private final NodeIdentity identity;
     private final ControlPlaneClient controlPlaneClient;
     private final HeartbeatLoop heartbeatLoop;
 
     private WorkerNode(
             Server grpcServer,
             TaskRunner taskRunner,
+            NodeIdentity identity,
             ControlPlaneClient controlPlaneClient,
             HeartbeatLoop heartbeatLoop) {
         this.grpcServer = grpcServer;
         this.taskRunner = taskRunner;
+        this.identity = identity;
         this.controlPlaneClient = controlPlaneClient;
         this.heartbeatLoop = heartbeatLoop;
     }
@@ -30,28 +33,25 @@ public final class WorkerNode implements AutoCloseable {
                 .setMemoryMb(config.memoryCapacityMb())
                 .build();
         TaskRunner taskRunner = new TaskRunner(config.cpuCapacityMillis(), config.memoryCapacityMb());
+        NodeIdentity identity = new NodeIdentity();
         ControlPlaneClient controlPlaneClient = new ControlPlaneClient(config.controlPlaneAddresses());
 
-        // The service needs the node ID, which only exists after registering,
-        // so it reads it through this holder.
-        HeartbeatLoop[] heartbeatLoopHolder = new HeartbeatLoop[1];
         Server grpcServer = ServerBuilder.forPort(config.grpcPort())
-                .addService(new WorkerService(taskRunner, () -> heartbeatLoopHolder[0].nodeId()))
+                .addService(new WorkerService(taskRunner, identity))
                 .build()
                 .start();
 
         // Advertise the port actually bound, which matters when the config asked for port 0.
         String address = config.advertisedHost() + ":" + grpcServer.getPort();
         HeartbeatLoop heartbeatLoop = new HeartbeatLoop(
-                controlPlaneClient, taskRunner, address, capacity, config.heartbeatIntervalMillis());
-        heartbeatLoopHolder[0] = heartbeatLoop;
+                controlPlaneClient, taskRunner, identity, address, capacity, config.heartbeatIntervalMillis());
         heartbeatLoop.start();
-        return new WorkerNode(grpcServer, taskRunner, controlPlaneClient, heartbeatLoop);
+        return new WorkerNode(grpcServer, taskRunner, identity, controlPlaneClient, heartbeatLoop);
     }
 
     /** The current node ID, or null while the worker is not registered. */
     public String nodeId() {
-        return heartbeatLoop.nodeId();
+        return identity.current();
     }
 
     public List<String> runningAssignmentIds() {

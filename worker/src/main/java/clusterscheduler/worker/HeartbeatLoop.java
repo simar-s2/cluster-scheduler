@@ -16,23 +16,23 @@ final class HeartbeatLoop implements AutoCloseable {
 
     private final ControlPlaneClient controlPlane;
     private final TaskRunner taskRunner;
+    private final NodeIdentity identity;
     private final String address;
     private final Resources capacity;
     private final long intervalMillis;
     private final ScheduledExecutorService timer =
             Executors.newSingleThreadScheduledExecutor(runnable -> new Thread(runnable, "heartbeat"));
 
-    // Null until the first successful registration. Only the timer thread writes it.
-    private volatile String nodeId;
-
     HeartbeatLoop(
             ControlPlaneClient controlPlane,
             TaskRunner taskRunner,
+            NodeIdentity identity,
             String address,
             Resources capacity,
             long intervalMillis) {
         this.controlPlane = controlPlane;
         this.taskRunner = taskRunner;
+        this.identity = identity;
         this.address = address;
         this.capacity = capacity;
         this.intervalMillis = intervalMillis;
@@ -40,11 +40,6 @@ final class HeartbeatLoop implements AutoCloseable {
 
     void start() {
         timer.scheduleWithFixedDelay(this::beatAndLogFailures, 0, intervalMillis, TimeUnit.MILLISECONDS);
-    }
-
-    /** The current node ID, or null while the worker is not registered. */
-    String nodeId() {
-        return nodeId;
     }
 
     private void beatAndLogFailures() {
@@ -58,9 +53,10 @@ final class HeartbeatLoop implements AutoCloseable {
     }
 
     private void beat() {
-        if (nodeId == null) {
+        if (identity.current() == null) {
             register();
         }
+        String nodeId = identity.current();
         TaskRunner.Snapshot snapshot = taskRunner.snapshot();
         HeartbeatRequest request = HeartbeatRequest.newBuilder()
                 .setNodeId(nodeId)
@@ -76,7 +72,7 @@ final class HeartbeatLoop implements AutoCloseable {
         taskRunner.markFinishedReported(snapshot.finishedAssignmentIds());
         if (response.getMustReregister()) {
             log.warn("Control plane no longer knows node {}; registering again", nodeId);
-            nodeId = null;
+            identity.clear();
         }
     }
 
@@ -85,7 +81,8 @@ final class HeartbeatLoop implements AutoCloseable {
                 .setAddress(address)
                 .setCapacity(capacity)
                 .build();
-        nodeId = controlPlane.registerNode(request).getNodeId();
+        String nodeId = controlPlane.registerNode(request).getNodeId();
+        identity.set(nodeId);
         log.info("Registered as node {} at {}", nodeId, address);
     }
 

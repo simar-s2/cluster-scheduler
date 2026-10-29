@@ -5,7 +5,6 @@ import clusterscheduler.proto.AssignTaskResponse;
 import clusterscheduler.proto.AssignTaskResponse.Result;
 import clusterscheduler.proto.WorkerGrpc;
 import io.grpc.stub.StreamObserver;
-import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,11 +13,11 @@ final class WorkerService extends WorkerGrpc.WorkerImplBase {
     private static final Logger log = LoggerFactory.getLogger(WorkerService.class);
 
     private final TaskRunner taskRunner;
-    private final Supplier<String> currentNodeId;
+    private final NodeIdentity identity;
 
-    WorkerService(TaskRunner taskRunner, Supplier<String> currentNodeId) {
+    WorkerService(TaskRunner taskRunner, NodeIdentity identity) {
         this.taskRunner = taskRunner;
-        this.currentNodeId = currentNodeId;
+        this.identity = identity;
     }
 
     @Override
@@ -28,7 +27,7 @@ final class WorkerService extends WorkerGrpc.WorkerImplBase {
     }
 
     private Result decide(AssignTaskRequest request) {
-        if (!request.getNodeId().equals(currentNodeId.get())) {
+        if (!request.getNodeId().equals(identity.current())) {
             log.warn("Rejected assignment {}: it is for node {}, not this node",
                     request.getAssignmentId(), request.getNodeId());
             return Result.RESULT_WRONG_NODE;
