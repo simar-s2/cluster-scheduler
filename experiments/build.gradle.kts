@@ -30,3 +30,20 @@ tasks.test {
         events("passed", "failed", "skipped")
     }
 }
+
+// One task per experiment, run from the repository root so docker compose
+// finds docker-compose.yml and results land in results/.
+fun registerExperiment(taskName: String, mainClassName: String, summary: String) {
+    tasks.register<JavaExec>(taskName) {
+        group = "experiments"
+        description = summary
+        classpath = sourceSets["main"].runtimeClasspath
+        mainClass = mainClassName
+        workingDir = rootDir
+    }
+}
+
+registerExperiment(
+    "failoverChaos",
+    "clusterscheduler.experiments.FailoverChaosExperiment",
+    "Kill and pause the leader 200 times while submitting jobs, then count double placements")
