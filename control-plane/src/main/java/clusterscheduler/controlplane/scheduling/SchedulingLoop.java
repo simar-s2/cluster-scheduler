@@ -9,6 +9,7 @@ import clusterscheduler.controlplane.state.JobRepository;
 import clusterscheduler.controlplane.state.NodeRepository;
 import clusterscheduler.controlplane.state.NodeSpace;
 import clusterscheduler.controlplane.state.PendingJob;
+import io.micrometer.core.instrument.Timer;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -57,10 +58,9 @@ public final class SchedulingLoop {
 
     /** Runs one pass as the leader of the given epoch. */
     public void runOnce(long epoch) {
-        metrics.schedulingPass.record(() -> schedule(epoch));
-    }
-
-    private void schedule(long epoch) {
+        // Only passes that had something to schedule are timed, so idle
+        // passes do not drag the average down.
+        Timer.Sample passTimer = Timer.start();
         List<PendingJob> pendingJobs = jobRepository.findPending(batchSize);
         if (pendingJobs.isEmpty()) {
             return;
@@ -68,11 +68,13 @@ public final class SchedulingLoop {
         List<NodeSpace> nodes = nodeRepository.findNodesWithFreeSpace();
         List<Placement> placements = scheduler.place(pendingJobs, nodes);
         if (placements.isEmpty()) {
+            passTimer.stop(metrics.schedulingPass);
             return;
         }
         List<Assignment> newAssignments = placements.stream().map(SchedulingLoop::toAssignment).toList();
         List<Assignment> saved = fencedTransactions.run(
                 epoch, connection -> assignmentRepository.saveNew(connection, newAssignments, epoch));
+        passTimer.stop(metrics.schedulingPass);
         metrics.placementsSaved.increment(saved.size());
         log.debug("Placed {} of {} pending jobs", saved.size(), pendingJobs.size());
         assignmentSender.sendAll(saved, epoch);

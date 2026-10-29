@@ -24,7 +24,7 @@ public final class Metrics {
     public final Counter fencedWritesRejected =
             counter("scheduler_fenced_writes_rejected", "Leader writes refused because the epoch was stale");
     public final Timer schedulingPass = Timer.builder("scheduler_scheduling_pass")
-            .description("Time for one scheduling pass on the leader")
+            .description("Time for one scheduling pass on the leader that had pending jobs")
             .register(registry);
 
     /** Reports whether this replica leads, and under which epoch, read fresh at every scrape. */
