@@ -7,6 +7,7 @@ import java.util.Map;
 /** Settings for one control plane replica. */
 public record ControlPlaneConfig(
         String replicaId,
+        String grpcBindHost,
         int grpcPort,
         String databaseUrl,
         String databaseUser,
@@ -28,6 +29,7 @@ public record ControlPlaneConfig(
         Settings settings = new Settings(variables);
         return new ControlPlaneConfig(
                 settings.text("REPLICA_ID", hostname()),
+                settings.text("GRPC_BIND_HOST", "0.0.0.0"),
                 (int) settings.number("GRPC_PORT", 9090),
                 settings.text("DATABASE_URL", "jdbc:postgresql://localhost:5432/scheduler"),
                 settings.text("DATABASE_USER", "scheduler"),

@@ -15,8 +15,9 @@ import clusterscheduler.controlplane.state.HeartbeatRepository;
 import clusterscheduler.controlplane.state.JobRepository;
 import clusterscheduler.controlplane.state.NodeRepository;
 import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.OptionalLong;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -62,7 +63,8 @@ public final class ControlPlane implements AutoCloseable {
         Leadership leadership = new Leadership();
         AssignmentSender assignmentSender = new AssignmentSender(leadership);
 
-        Server grpcServer = ServerBuilder.forPort(config.grpcPort())
+        Server grpcServer = NettyServerBuilder
+                .forAddress(new InetSocketAddress(config.grpcBindHost(), config.grpcPort()))
                 .addService(new ControlPlaneService(nodeRepository, heartbeatRepository, jobRepository))
                 .build()
                 .start();

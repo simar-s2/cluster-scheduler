@@ -25,10 +25,16 @@ public final class TestDatabase {
         return new Database(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
     }
 
-    /** Settings for an in-process replica: a random free port and this test database. */
+    /**
+     * Settings for an in-process replica: a random free port on 127.0.0.1 and
+     * this test database. Binding to 127.0.0.1 rather than every interface
+     * matters on macOS, where Docker Desktop listens on 127.0.0.1 ports in
+     * the same range the OS hands out for port 0.
+     */
     public static ControlPlaneConfig configForReplica(String replicaId, Map<String, String> overrides) {
         Map<String, String> variables = new HashMap<>(overrides);
         variables.put("REPLICA_ID", replicaId);
+        variables.put("GRPC_BIND_HOST", "127.0.0.1");
         variables.put("GRPC_PORT", "0");
         variables.put("DATABASE_URL", POSTGRES.getJdbcUrl());
         variables.put("DATABASE_USER", POSTGRES.getUsername());

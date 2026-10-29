@@ -15,7 +15,9 @@ dependencies {
     implementation(project(":proto"))
     implementation(libs.slf4j.api)
     runtimeOnly(libs.slf4j.simple)
-    runtimeOnly(libs.grpc.netty.shaded)
+    // Compile scope, not just runtime: the server is built with
+    // NettyServerBuilder so it can bind to a chosen network interface.
+    implementation(libs.grpc.netty.shaded)
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)

@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,8 +25,14 @@ class NodeRegistrationTest {
         TestDatabase.reset();
         database = TestDatabase.connect();
         controlPlane = ControlPlane.start(TestDatabase.configForReplica("replica-1", Map.of()));
-        worker = WorkerNode.start(new WorkerConfig(
-                List.of("localhost:" + controlPlane.grpcPort()), "127.0.0.1", 0, 4_000, 8_192, 100));
+        worker = WorkerNode.start(WorkerConfig.fromVariables(Map.of(
+                "CONTROL_PLANE_ADDRESSES", "127.0.0.1:" + controlPlane.grpcPort(),
+                "ADVERTISED_HOST", "127.0.0.1",
+                "GRPC_BIND_HOST", "127.0.0.1",
+                "GRPC_PORT", "0",
+                "CPU_CAPACITY_MILLIS", "4000",
+                "MEMORY_CAPACITY_MB", "8192",
+                "HEARTBEAT_INTERVAL_MILLIS", "100")));
     }
 
     @AfterEach

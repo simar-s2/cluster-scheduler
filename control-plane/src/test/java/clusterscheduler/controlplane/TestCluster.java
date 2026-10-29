@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Real control plane replicas and real workers, all in this JVM, talking
@@ -57,11 +58,17 @@ final class TestCluster implements AutoCloseable {
     }
 
     WorkerNode addWorker(long heartbeatIntervalMillis) throws IOException {
-        List<String> replicaAddresses = controlPlanes.stream()
-                .map(controlPlane -> "localhost:" + controlPlane.grpcPort())
-                .toList();
-        WorkerNode worker = WorkerNode.start(new WorkerConfig(
-                replicaAddresses, "127.0.0.1", 0, WORKER_CPU_MILLIS, WORKER_MEMORY_MB, heartbeatIntervalMillis));
+        String replicaAddresses = controlPlanes.stream()
+                .map(controlPlane -> "127.0.0.1:" + controlPlane.grpcPort())
+                .collect(Collectors.joining(","));
+        WorkerNode worker = WorkerNode.start(WorkerConfig.fromVariables(Map.of(
+                "CONTROL_PLANE_ADDRESSES", replicaAddresses,
+                "ADVERTISED_HOST", "127.0.0.1",
+                "GRPC_BIND_HOST", "127.0.0.1",
+                "GRPC_PORT", "0",
+                "CPU_CAPACITY_MILLIS", Long.toString(WORKER_CPU_MILLIS),
+                "MEMORY_CAPACITY_MB", Long.toString(WORKER_MEMORY_MB),
+                "HEARTBEAT_INTERVAL_MILLIS", Long.toString(heartbeatIntervalMillis))));
         workers.add(worker);
         return worker;
     }
@@ -105,7 +112,7 @@ final class TestCluster implements AutoCloseable {
             if (!controlPlaneRunning.get(i)) {
                 continue;
             }
-            ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:" + controlPlanes.get(i).grpcPort())
+            ManagedChannel channel = ManagedChannelBuilder.forTarget("127.0.0.1:" + controlPlanes.get(i).grpcPort())
                     .usePlaintext()
                     .build();
             try {

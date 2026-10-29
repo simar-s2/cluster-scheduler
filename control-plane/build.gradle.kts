@@ -17,7 +17,9 @@ dependencies {
     implementation(libs.hikaricp)
     implementation(libs.slf4j.api)
     runtimeOnly(libs.slf4j.simple)
-    runtimeOnly(libs.grpc.netty.shaded)
+    // Compile scope, not just runtime: the server is built with
+    // NettyServerBuilder so it can bind to a chosen network interface.
+    implementation(libs.grpc.netty.shaded)
 
     // Integration tests start real workers against a real PostgreSQL.
     testImplementation(project(":worker"))

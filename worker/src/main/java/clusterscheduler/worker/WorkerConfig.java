@@ -10,6 +10,7 @@ import java.util.Map;
 public record WorkerConfig(
         List<String> controlPlaneAddresses,
         String advertisedHost,
+        String grpcBindHost,
         int grpcPort,
         long cpuCapacityMillis,
         long memoryCapacityMb,
@@ -26,6 +27,7 @@ public record WorkerConfig(
                         .map(String::trim)
                         .toList(),
                 settings.text("ADVERTISED_HOST", localIpAddress()),
+                settings.text("GRPC_BIND_HOST", "0.0.0.0"),
                 (int) settings.number("GRPC_PORT", 9100),
                 settings.number("CPU_CAPACITY_MILLIS", 4_000),
                 settings.number("MEMORY_CAPACITY_MB", 8_192),

@@ -2,8 +2,9 @@ package clusterscheduler.worker;
 
 import clusterscheduler.proto.Resources;
 import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.List;
 
 /** One worker node: builds every component and owns their lifecycle. */
@@ -36,7 +37,8 @@ public final class WorkerNode implements AutoCloseable {
         NodeIdentity identity = new NodeIdentity();
         ControlPlaneClient controlPlaneClient = new ControlPlaneClient(config.controlPlaneAddresses());
 
-        Server grpcServer = ServerBuilder.forPort(config.grpcPort())
+        Server grpcServer = NettyServerBuilder
+                .forAddress(new InetSocketAddress(config.grpcBindHost(), config.grpcPort()))
                 .addService(new WorkerService(taskRunner, identity, new EpochFence()))
                 .build()
                 .start();
