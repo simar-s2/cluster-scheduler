@@ -20,5 +20,32 @@ services:
       timeout: 2s
       retries: 15
 
+  control-plane-1:
+    build:
+      context: .
+      target: control-plane
+    image: cluster-scheduler/control-plane
+    environment:
+      REPLICA_ID: control-plane-1
+      DATABASE_URL: jdbc:postgresql://postgres:5432/scheduler
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Scale with: docker compose up --scale worker=N
+  worker:
+    build:
+      context: .
+      target: worker
+    image: cluster-scheduler/worker
+    environment:
+      CONTROL_PLANE_ADDRESSES: control-plane-1:9090
+      CPU_CAPACITY_MILLIS: 4000
+      MEMORY_CAPACITY_MB: 8192
+    depends_on:
+      - control-plane-1
+    deploy:
+      replicas: 3
+
 volumes:
   postgres-data:
