@@ -1,6 +1,7 @@
 package clusterscheduler.controlplane;
 
 import clusterscheduler.controlplane.database.DatabaseException;
+import clusterscheduler.controlplane.metrics.Metrics;
 import clusterscheduler.controlplane.state.HeartbeatRepository;
 import clusterscheduler.controlplane.state.JobRepository;
 import clusterscheduler.controlplane.state.NodeHeartbeat;
@@ -28,12 +29,17 @@ final class ControlPlaneService extends ControlPlaneGrpc.ControlPlaneImplBase {
     private final NodeRepository nodeRepository;
     private final HeartbeatRepository heartbeatRepository;
     private final JobRepository jobRepository;
+    private final Metrics metrics;
 
     ControlPlaneService(
-            NodeRepository nodeRepository, HeartbeatRepository heartbeatRepository, JobRepository jobRepository) {
+            NodeRepository nodeRepository,
+            HeartbeatRepository heartbeatRepository,
+            JobRepository jobRepository,
+            Metrics metrics) {
         this.nodeRepository = nodeRepository;
         this.heartbeatRepository = heartbeatRepository;
         this.jobRepository = jobRepository;
+        this.metrics = metrics;
     }
 
     @Override
@@ -60,6 +66,7 @@ final class ControlPlaneService extends ControlPlaneGrpc.ControlPlaneImplBase {
                     request.getFree().getMemoryMb(),
                     request.getRunningAssignmentIdsList(),
                     request.getFinishedAssignmentIdsList()));
+            metrics.heartbeatsReceived.increment();
             return HeartbeatResponse.newBuilder().setMustReregister(!nodeIsKnown).build();
         });
     }
@@ -76,6 +83,7 @@ final class ControlPlaneService extends ControlPlaneGrpc.ControlPlaneImplBase {
                     request.getRequested().getCpuMillis(),
                     request.getRequested().getMemoryMb(),
                     request.getDurationMillis());
+            metrics.jobsSubmitted.increment();
             return SubmitJobResponse.getDefaultInstance();
         });
     }

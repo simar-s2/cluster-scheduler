@@ -36,6 +36,7 @@ public final class TestDatabase {
         variables.put("REPLICA_ID", replicaId);
         variables.put("GRPC_BIND_HOST", "127.0.0.1");
         variables.put("GRPC_PORT", "0");
+        variables.put("METRICS_PORT", "0");
         variables.put("DATABASE_URL", POSTGRES.getJdbcUrl());
         variables.put("DATABASE_USER", POSTGRES.getUsername());
         variables.put("DATABASE_PASSWORD", POSTGRES.getPassword());

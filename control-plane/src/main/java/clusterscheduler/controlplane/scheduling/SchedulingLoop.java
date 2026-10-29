@@ -2,6 +2,7 @@ package clusterscheduler.controlplane.scheduling;
 
 import clusterscheduler.controlplane.delivery.AssignmentSender;
 import clusterscheduler.controlplane.leadership.FencedTransactions;
+import clusterscheduler.controlplane.metrics.Metrics;
 import clusterscheduler.controlplane.state.Assignment;
 import clusterscheduler.controlplane.state.AssignmentRepository;
 import clusterscheduler.controlplane.state.JobRepository;
@@ -34,6 +35,7 @@ public final class SchedulingLoop {
     private final AssignmentRepository assignmentRepository;
     private final AssignmentSender assignmentSender;
     private final BestFitScheduler scheduler = new BestFitScheduler();
+    private final Metrics metrics;
     private final int batchSize;
 
     public SchedulingLoop(
@@ -42,17 +44,23 @@ public final class SchedulingLoop {
             NodeRepository nodeRepository,
             AssignmentRepository assignmentRepository,
             AssignmentSender assignmentSender,
+            Metrics metrics,
             int batchSize) {
         this.fencedTransactions = fencedTransactions;
         this.jobRepository = jobRepository;
         this.nodeRepository = nodeRepository;
         this.assignmentRepository = assignmentRepository;
         this.assignmentSender = assignmentSender;
+        this.metrics = metrics;
         this.batchSize = batchSize;
     }
 
     /** Runs one pass as the leader of the given epoch. */
     public void runOnce(long epoch) {
+        metrics.schedulingPass.record(() -> schedule(epoch));
+    }
+
+    private void schedule(long epoch) {
         List<PendingJob> pendingJobs = jobRepository.findPending(batchSize);
         if (pendingJobs.isEmpty()) {
             return;
@@ -65,6 +73,7 @@ public final class SchedulingLoop {
         List<Assignment> newAssignments = placements.stream().map(SchedulingLoop::toAssignment).toList();
         List<Assignment> saved = fencedTransactions.run(
                 epoch, connection -> assignmentRepository.saveNew(connection, newAssignments, epoch));
+        metrics.placementsSaved.increment(saved.size());
         log.debug("Placed {} of {} pending jobs", saved.size(), pendingJobs.size());
         assignmentSender.sendAll(saved, epoch);
     }

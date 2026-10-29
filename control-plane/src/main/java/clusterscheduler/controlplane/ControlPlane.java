@@ -8,6 +8,8 @@ import clusterscheduler.controlplane.leadership.LeaderElector;
 import clusterscheduler.controlplane.leadership.Leadership;
 import clusterscheduler.controlplane.leadership.LeaseRepository;
 import clusterscheduler.controlplane.leadership.StaleEpochException;
+import clusterscheduler.controlplane.metrics.Metrics;
+import clusterscheduler.controlplane.metrics.MetricsServer;
 import clusterscheduler.controlplane.reconcile.ReconcileLoop;
 import clusterscheduler.controlplane.scheduling.SchedulingLoop;
 import clusterscheduler.controlplane.state.AssignmentRepository;
@@ -35,6 +37,8 @@ public final class ControlPlane implements AutoCloseable {
     private final AssignmentSender assignmentSender;
     private final Leadership leadership;
     private final LeaderElector leaderElector;
+    private final Metrics metrics;
+    private final MetricsServer metricsServer;
     // Every decision (placing tasks, declaring nodes dead) runs on this one
     // thread, so decisions never race each other inside a replica.
     private final ScheduledExecutorService decisionThread =
@@ -45,12 +49,16 @@ public final class ControlPlane implements AutoCloseable {
             Server grpcServer,
             AssignmentSender assignmentSender,
             Leadership leadership,
-            LeaderElector leaderElector) {
+            LeaderElector leaderElector,
+            Metrics metrics,
+            MetricsServer metricsServer) {
         this.database = database;
         this.grpcServer = grpcServer;
         this.assignmentSender = assignmentSender;
         this.leadership = leadership;
         this.leaderElector = leaderElector;
+        this.metrics = metrics;
+        this.metricsServer = metricsServer;
     }
 
     public static ControlPlane start(ControlPlaneConfig config) throws IOException {
@@ -62,25 +70,28 @@ public final class ControlPlane implements AutoCloseable {
         AssignmentRepository assignmentRepository = new AssignmentRepository();
         Leadership leadership = new Leadership();
         AssignmentSender assignmentSender = new AssignmentSender(leadership);
+        Metrics metrics = new Metrics();
+        metrics.watchLeadership(leadership);
+        MetricsServer metricsServer = new MetricsServer(metrics, config.grpcBindHost(), config.metricsPort());
 
         Server grpcServer = NettyServerBuilder
                 .forAddress(new InetSocketAddress(config.grpcBindHost(), config.grpcPort()))
-                .addService(new ControlPlaneService(nodeRepository, heartbeatRepository, jobRepository))
+                .addService(new ControlPlaneService(nodeRepository, heartbeatRepository, jobRepository, metrics))
                 .build()
                 .start();
         LeaderElector leaderElector = new LeaderElector(
                 config.replicaId(), new LeaseRepository(database), leadership,
                 config.leaseDurationMillis(), config.leaseRenewIntervalMillis());
-        ControlPlane controlPlane =
-                new ControlPlane(database, grpcServer, assignmentSender, leadership, leaderElector);
+        ControlPlane controlPlane = new ControlPlane(
+                database, grpcServer, assignmentSender, leadership, leaderElector, metrics, metricsServer);
 
         FencedTransactions fencedTransactions = new FencedTransactions(database);
         SchedulingLoop schedulingLoop = new SchedulingLoop(
                 fencedTransactions, jobRepository, nodeRepository, assignmentRepository, assignmentSender,
-                config.schedulingBatchSize());
+                metrics, config.schedulingBatchSize());
         ReconcileLoop reconcileLoop = new ReconcileLoop(
                 database, fencedTransactions, nodeRepository, assignmentRepository, assignmentSender,
-                config.heartbeatTimeoutMillis(), config.resendAfterMillis());
+                metrics, config.heartbeatTimeoutMillis(), config.resendAfterMillis());
         controlPlane.repeatWhileLeader("scheduling", schedulingLoop::runOnce, config.schedulingIntervalMillis());
         controlPlane.repeatWhileLeader("reconcile", reconcileLoop::runOnce, config.reconcileIntervalMillis());
         leaderElector.start();
@@ -90,6 +101,11 @@ public final class ControlPlane implements AutoCloseable {
     /** The port the gRPC server listens on. Useful when the config asked for port 0. */
     public int grpcPort() {
         return grpcServer.getPort();
+    }
+
+    /** The port /metrics is served on. Useful when the config asked for port 0. */
+    public int metricsPort() {
+        return metricsServer.port();
     }
 
     public boolean isLeader() {
@@ -122,6 +138,7 @@ public final class ControlPlane implements AutoCloseable {
             } catch (StaleEpochException fencedOut) {
                 // PostgreSQL refused the write: a newer leader exists. Stop
                 // acting at once instead of waiting for the local deadline.
+                metrics.fencedWritesRejected.increment();
                 log.warn("FENCED: {} write rejected, {}; stepping down", stepName, fencedOut.getMessage());
                 leadership.stepDown(fencedOut.staleEpoch());
             } catch (RuntimeException failure) {
@@ -144,6 +161,7 @@ public final class ControlPlane implements AutoCloseable {
             Thread.currentThread().interrupt();
         }
         assignmentSender.close();
+        metricsServer.close();
         database.close();
     }
 }

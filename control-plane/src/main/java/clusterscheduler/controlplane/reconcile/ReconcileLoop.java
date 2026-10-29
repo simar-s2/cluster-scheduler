@@ -3,6 +3,7 @@ package clusterscheduler.controlplane.reconcile;
 import clusterscheduler.controlplane.database.Database;
 import clusterscheduler.controlplane.delivery.AssignmentSender;
 import clusterscheduler.controlplane.leadership.FencedTransactions;
+import clusterscheduler.controlplane.metrics.Metrics;
 import clusterscheduler.controlplane.state.Assignment;
 import clusterscheduler.controlplane.state.AssignmentRepository;
 import clusterscheduler.controlplane.state.DeadNodes;
@@ -40,6 +41,7 @@ public final class ReconcileLoop {
     private final NodeRepository nodeRepository;
     private final AssignmentRepository assignmentRepository;
     private final AssignmentSender assignmentSender;
+    private final Metrics metrics;
     private final long heartbeatTimeoutMillis;
     private final long resendAfterMillis;
 
@@ -49,6 +51,7 @@ public final class ReconcileLoop {
             NodeRepository nodeRepository,
             AssignmentRepository assignmentRepository,
             AssignmentSender assignmentSender,
+            Metrics metrics,
             long heartbeatTimeoutMillis,
             long resendAfterMillis) {
         this.database = database;
@@ -56,6 +59,7 @@ public final class ReconcileLoop {
         this.nodeRepository = nodeRepository;
         this.assignmentRepository = assignmentRepository;
         this.assignmentSender = assignmentSender;
+        this.metrics = metrics;
         this.heartbeatTimeoutMillis = heartbeatTimeoutMillis;
         this.resendAfterMillis = resendAfterMillis;
     }
@@ -72,6 +76,8 @@ public final class ReconcileLoop {
         if (deadNodes.isEmpty()) {
             return;
         }
+        metrics.nodesDeclaredDead.increment(deadNodes.nodeIds().size());
+        metrics.jobsRequeued.increment(deadNodes.requeuedJobIds().size());
         log.warn("Declared {} node(s) dead and requeued {} job(s): {}",
                 deadNodes.nodeIds().size(), deadNodes.requeuedJobIds().size(), deadNodes.nodeIds());
         deadNodes.nodeIds().forEach(assignmentSender::forgetNode);
@@ -81,6 +87,7 @@ public final class ReconcileLoop {
         List<Assignment> unconfirmed = database.inTransaction(connection ->
                 assignmentRepository.findUnconfirmed(connection, resendAfterMillis, MAX_RESENDS_PER_PASS));
         if (!unconfirmed.isEmpty()) {
+            metrics.assignmentsResent.increment(unconfirmed.size());
             log.info("Resending {} unconfirmed assignment(s)", unconfirmed.size());
             assignmentSender.sendAll(unconfirmed, epoch);
         }
