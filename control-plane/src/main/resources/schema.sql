@@ -34,3 +34,25 @@ CREATE TABLE IF NOT EXISTS jobs (
 -- The pending queue, oldest first. Partial, so finished jobs do not bloat it.
 CREATE INDEX IF NOT EXISTS pending_jobs_in_queue_order
     ON jobs (submitted_at, job_id) WHERE state = 'PENDING';
+
+-- Every placement of a job on a node, kept forever as history. ASSIGNED means
+-- the leader saved it, RUNNING means the node confirmed it in a heartbeat.
+CREATE TABLE IF NOT EXISTS assignments (
+    assignment_id TEXT        PRIMARY KEY,
+    job_id        TEXT        NOT NULL REFERENCES jobs (job_id),
+    node_id       TEXT        NOT NULL REFERENCES nodes (node_id),
+    state         TEXT        NOT NULL DEFAULT 'ASSIGNED'
+                              CHECK (state IN ('ASSIGNED', 'RUNNING', 'FINISHED')),
+    assigned_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    running_at    TIMESTAMPTZ,
+    ended_at      TIMESTAMPTZ
+);
+
+-- The database itself refuses a second active assignment for the same job,
+-- whatever bug or race tries to create one.
+CREATE UNIQUE INDEX IF NOT EXISTS one_active_assignment_per_job
+    ON assignments (job_id) WHERE state IN ('ASSIGNED', 'RUNNING');
+
+-- Used to add up what is placed on each node.
+CREATE INDEX IF NOT EXISTS active_assignments_by_node
+    ON assignments (node_id) WHERE state IN ('ASSIGNED', 'RUNNING');

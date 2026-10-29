@@ -42,7 +42,7 @@ final class TestDatabase {
             SchemaInitializer.apply(database);
             database.inTransaction(connection -> {
                 try (Statement statement = connection.createStatement()) {
-                    statement.execute("TRUNCATE nodes");
+                    statement.execute("TRUNCATE assignments, jobs, nodes");
                 }
                 return null;
             });
