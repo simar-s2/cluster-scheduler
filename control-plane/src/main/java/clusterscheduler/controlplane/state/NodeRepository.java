@@ -39,7 +39,7 @@ public final class NodeRepository {
     }
 
     /**
-     * Every node with its free space, sorted by node ID. Free space comes from
+     * Every live node with its free space, sorted by node ID. Free space comes from
      * the assignments table, not from heartbeats, because heartbeats lag
      * behind: a task placed a moment ago is not in any heartbeat yet.
      */
@@ -53,6 +53,7 @@ public final class NodeRepository {
                     LEFT JOIN assignments a
                            ON a.node_id = n.node_id AND a.state IN ('ASSIGNED', 'RUNNING')
                     LEFT JOIN jobs j ON j.job_id = a.job_id
+                    WHERE n.status = 'ALIVE'
                     GROUP BY n.node_id
                     ORDER BY n.node_id
                     """;
