@@ -49,7 +49,7 @@ flowchart LR
 
 **Each kind of ID is chosen by whoever can make it unique and safe to retry.**
 - The client picks the `job_id`, so resubmitting the same job after a timeout creates one job, not two.
-- The control plane picks a new `node_id` on every registration. A worker that restarts has lost its in-memory tasks, so it should not inherit its old identity and the tasks that came with it. Its old node times out and those tasks are rescheduled.
+- Every registration gets a new `node_id`. A worker that restarts has lost its in-memory tasks, so it should not inherit its old identity and the tasks that came with it. Its old node times out and those tasks are rescheduled. (Changed in milestone 7: the worker now proposes the ID, a fresh UUID per registration, reused across retries of that registration, so a retried `RegisterNode` cannot create a second node. See that section.)
 - The leader picks an `assignment_id` for every placement. Workers remember the IDs they have seen, so a repeated `AssignTask` is harmless.
 
 **Heartbeats send the full state, not just changes.** Each heartbeat lists every assignment the worker is running. If one heartbeat is lost, the next one carries the same information, and the reconcile loop always compares against a complete picture. Finished assignments are the one change-based field. The worker keeps sending them until a heartbeat succeeds, and the control plane ignores repeats.
