@@ -23,8 +23,8 @@ public final class HeartbeatRepository {
 
     /**
      * Records the heartbeat in one transaction. Returns false if the node is
-     * unknown, in which case nothing is recorded and the worker must register
-     * again.
+     * unknown or already marked dead, in which case nothing is recorded and
+     * the worker must stop its tasks and register again.
      */
     public boolean record(NodeHeartbeat heartbeat) {
         return database.inTransaction(connection -> {
@@ -39,13 +39,19 @@ public final class HeartbeatRepository {
         });
     }
 
+    /**
+     * The status check and the update are one statement, and the leader marks
+     * nodes dead with an UPDATE on the same row. PostgreSQL's row lock orders
+     * the two: either this heartbeat lands first and the node is no longer
+     * expired, or the node is already DEAD and this matches no row.
+     */
     private static boolean touchNode(Connection connection, NodeHeartbeat heartbeat) throws SQLException {
         String sql = """
                 UPDATE nodes
                 SET last_heartbeat_at = now(),
                     reported_free_cpu_millis = ?,
                     reported_free_memory_mb = ?
-                WHERE node_id = ?
+                WHERE node_id = ? AND status = 'ALIVE'
                 """;
         try (PreparedStatement update = connection.prepareStatement(sql)) {
             update.setLong(1, heartbeat.freeCpuMillis());
