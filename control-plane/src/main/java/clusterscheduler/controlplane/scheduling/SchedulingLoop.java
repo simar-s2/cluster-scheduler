@@ -60,7 +60,7 @@ public final class SchedulingLoop {
         }
         List<Assignment> newAssignments = placements.stream().map(SchedulingLoop::toAssignment).toList();
         List<Assignment> saved = database.inTransaction(
-                connection -> assignmentRepository.saveNew(connection, newAssignments));
+                connection -> assignmentRepository.saveNew(connection, newAssignments, epoch));
         log.debug("Placed {} of {} pending jobs", saved.size(), pendingJobs.size());
         assignmentSender.sendAll(saved, epoch);
     }

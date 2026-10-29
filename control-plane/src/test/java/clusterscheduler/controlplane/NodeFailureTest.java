@@ -89,7 +89,7 @@ class NodeFailureTest {
         // assignment exists, but the worker never heard about it.
         cluster.execute("INSERT INTO jobs (job_id, cpu_millis, memory_mb, duration_millis, state) "
                 + "VALUES ('orphan', 500, 500, 600000, 'SCHEDULED')");
-        cluster.execute("INSERT INTO assignments (assignment_id, job_id, node_id) VALUES ('orphan-assignment', 'orphan', ?)",
+        cluster.execute("INSERT INTO assignments (assignment_id, job_id, node_id, epoch) VALUES ('orphan-assignment', 'orphan', ?, 1)",
                 nodeId);
 
         Eventually.waitUntil("the worker runs the resent assignment", Duration.ofSeconds(5),

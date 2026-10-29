@@ -15,18 +15,20 @@ import java.util.List;
 public final class AssignmentRepository {
 
     /**
-     * Saves new assignments and marks their jobs SCHEDULED. Returns the ones
-     * actually saved: a job that is no longer PENDING is skipped, so the same
-     * job can never be claimed twice.
+     * Saves new assignments, written in the given epoch, and marks their jobs
+     * SCHEDULED. Returns the ones actually saved: a job that is no longer
+     * PENDING is skipped, so the same job can never be claimed twice.
      */
-    public List<Assignment> saveNew(Connection connection, List<Assignment> assignments) throws SQLException {
+    public List<Assignment> saveNew(Connection connection, List<Assignment> assignments, long epoch)
+            throws SQLException {
         List<Assignment> claimed = claimPendingJobs(connection, assignments);
-        String sql = "INSERT INTO assignments (assignment_id, job_id, node_id) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO assignments (assignment_id, job_id, node_id, epoch) VALUES (?, ?, ?, ?)";
         try (PreparedStatement insert = connection.prepareStatement(sql)) {
             for (Assignment assignment : claimed) {
                 insert.setString(1, assignment.assignmentId());
                 insert.setString(2, assignment.jobId());
                 insert.setString(3, assignment.nodeId());
+                insert.setLong(4, epoch);
                 insert.addBatch();
             }
             insert.executeBatch();

@@ -47,6 +47,9 @@ CREATE TABLE IF NOT EXISTS assignments (
     assignment_id TEXT        PRIMARY KEY,
     job_id        TEXT        NOT NULL REFERENCES jobs (job_id),
     node_id       TEXT        NOT NULL REFERENCES nodes (node_id),
+    -- The leader term that wrote this row. Writes only commit while this is
+    -- still the current epoch, so it doubles as an audit of who decided what.
+    epoch         BIGINT      NOT NULL,
     state         TEXT        NOT NULL DEFAULT 'ASSIGNED'
                               CHECK (state IN ('ASSIGNED', 'RUNNING', 'FINISHED', 'LOST')),
     assigned_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
