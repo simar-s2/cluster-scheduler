@@ -4,10 +4,18 @@
 grpc = "1.85.1"
 # Must match the protobuf-java runtime that grpc-protobuf depends on.
 protobuf = "3.25.9"
+postgresql = "42.7.14"
+hikaricp = "7.1.0"
+slf4j = "2.0.20"
 
 [libraries]
 grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
 grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
+grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 
 [plugins]
 protobuf = { id = "com.google.protobuf", version = "0.10.0" }
