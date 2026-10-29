@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package clusterscheduler.v1;
+
+import "clusterscheduler/v1/resources.proto";
+
+option java_multiple_files = true;
+option java_package = "clusterscheduler.proto";
+
+// Served by every worker. Only the current leader calls it.
+service Worker {
+  // Starts a task on this worker. Calling it again with the same assignment
+  // ID does nothing, so the leader can retry, and a new leader can resend
+  // assignments it is unsure were delivered.
+  rpc AssignTask(AssignTaskRequest) returns (AssignTaskResponse);
+}
+
+message AssignTaskRequest {
+  // Unique for every placement of a job on a node. The worker uses it to
+  // ignore repeats of a request it has already handled.
+  string assignment_id = 1;
+  string job_id = 2;
+  Resources requested = 3;
+  int64 duration_millis = 4;
+  // Fencing token: the epoch (leader term) of the replica sending this
+  // request. The worker rejects a request whose epoch is lower than the
+  // highest it has seen, because that sender has since been replaced.
+  int64 leader_epoch = 5;
+}
+
+message AssignTaskResponse {
+  enum Result {
+    RESULT_UNSPECIFIED = 0;
+    // The task was started by this request.
+    RESULT_STARTED = 1;
+    // This assignment was already running or finished. Nothing changed.
+    RESULT_DUPLICATE = 2;
+    // Rejected because leader_epoch is older than one the worker has seen.
+    RESULT_STALE_EPOCH = 3;
+  }
+  Result result = 1;
+}
