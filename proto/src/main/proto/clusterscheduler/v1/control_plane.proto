@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package clusterscheduler.v1;
+
+import "clusterscheduler/v1/resources.proto";
+
+option java_multiple_files = true;
+option java_package = "clusterscheduler.proto";
+
+// Served by every control plane replica, leader and standbys alike.
+//
+// These calls only record facts reported from outside (a node joined, a node
+// is alive, a job was submitted) in PostgreSQL, so any replica can answer
+// them. Decisions (placing tasks, declaring nodes dead) are made only by the
+// leader, in its own loops, and never inside these calls.
+service ControlPlane {
+  // Called once by a worker when it starts.
+  rpc RegisterNode(RegisterNodeRequest) returns (RegisterNodeResponse);
+
+  // Called by every worker on a fixed interval. A node whose heartbeats stop
+  // for longer than the timeout is marked dead and its tasks are rescheduled.
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+
+  // Called by a client to add a job to the pending queue.
+  rpc SubmitJob(SubmitJobRequest) returns (SubmitJobResponse);
+}
+
+message RegisterNodeRequest {
+  // Where this worker's gRPC server listens, as host:port. The leader dials
+  // it to send task assignments.
+  string address = 1;
+  // Total CPU and memory this node offers to tasks.
+  Resources capacity = 2;
+}
+
+message RegisterNodeResponse {
+  // A new ID for every registration. A worker that restarts has lost its
+  // tasks, so it registers again as a new node instead of reusing its old ID.
+  string node_id = 1;
+}
+
+message HeartbeatRequest {
+  string node_id = 1;
+  // CPU and memory not held by running tasks.
+  Resources free = 2;
+  // Assignments this worker is running right now. The reconcile loop compares
+  // this list with the assignments table.
+  repeated string running_assignment_ids = 3;
+  // Assignments that finished since the last successful heartbeat. The worker
+  // sends them again if a heartbeat fails, so the control plane must treat a
+  // repeated report as a no-op.
+  repeated string finished_assignment_ids = 4;
+}
+
+message HeartbeatResponse {
+  // True when the control plane has already marked this node dead and moved
+  // its tasks to other nodes. The worker must stop all of its tasks and
+  // register again, otherwise those tasks would run in two places.
+  bool must_reregister = 1;
+}
+
+message SubmitJobRequest {
+  // Chosen by the client, usually a random UUID. Submitting the same ID twice
+  // creates one job, so a client can retry safely when a replica dies before
+  // answering.
+  string job_id = 1;
+  // CPU and memory the job's task needs. The task is only placed on a node
+  // with at least this much free.
+  Resources requested = 2;
+  // How long the simulated task holds its resources before it finishes.
+  int64 duration_millis = 3;
+}
+
+message SubmitJobResponse {}
