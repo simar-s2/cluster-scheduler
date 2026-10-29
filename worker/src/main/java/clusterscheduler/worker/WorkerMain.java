@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-/** Entry point for one worker node. */
+/** Entry point for a worker process: one node, or several simulated nodes if configured. */
 public final class WorkerMain {
     private WorkerMain() {}
 
