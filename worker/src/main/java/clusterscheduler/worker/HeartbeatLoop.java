@@ -15,6 +15,7 @@ final class HeartbeatLoop implements AutoCloseable {
     private static final Logger log = LoggerFactory.getLogger(HeartbeatLoop.class);
 
     private final ControlPlaneClient controlPlane;
+    private final TaskRunner taskRunner;
     private final String address;
     private final Resources capacity;
     private final long intervalMillis;
@@ -24,8 +25,14 @@ final class HeartbeatLoop implements AutoCloseable {
     // Null until the first successful registration. Only the timer thread writes it.
     private volatile String nodeId;
 
-    HeartbeatLoop(ControlPlaneClient controlPlane, String address, Resources capacity, long intervalMillis) {
+    HeartbeatLoop(
+            ControlPlaneClient controlPlane,
+            TaskRunner taskRunner,
+            String address,
+            Resources capacity,
+            long intervalMillis) {
         this.controlPlane = controlPlane;
+        this.taskRunner = taskRunner;
         this.address = address;
         this.capacity = capacity;
         this.intervalMillis = intervalMillis;
@@ -54,11 +61,19 @@ final class HeartbeatLoop implements AutoCloseable {
         if (nodeId == null) {
             register();
         }
+        TaskRunner.Snapshot snapshot = taskRunner.snapshot();
         HeartbeatRequest request = HeartbeatRequest.newBuilder()
                 .setNodeId(nodeId)
-                .setFree(capacity)
+                .setFree(Resources.newBuilder()
+                        .setCpuMillis(snapshot.freeCpuMillis())
+                        .setMemoryMb(snapshot.freeMemoryMb()))
+                .addAllRunningAssignmentIds(snapshot.runningAssignmentIds())
+                .addAllFinishedAssignmentIds(snapshot.finishedAssignmentIds())
                 .build();
         HeartbeatResponse response = controlPlane.heartbeat(request);
+        // Only now is it safe to forget these: the control plane has stored
+        // them. If the call had failed, the next heartbeat would send them again.
+        taskRunner.markFinishedReported(snapshot.finishedAssignmentIds());
         if (response.getMustReregister()) {
             log.warn("Control plane no longer knows node {}; registering again", nodeId);
             nodeId = null;
