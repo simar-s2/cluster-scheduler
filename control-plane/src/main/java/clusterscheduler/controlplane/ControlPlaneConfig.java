@@ -12,7 +12,10 @@ public record ControlPlaneConfig(
         String databaseUser,
         String databasePassword,
         long schedulingIntervalMillis,
-        int schedulingBatchSize) {
+        int schedulingBatchSize,
+        long reconcileIntervalMillis,
+        long heartbeatTimeoutMillis,
+        long resendAfterMillis) {
 
     /**
      * Reads the settings from a map of variables, such as System.getenv().
@@ -28,7 +31,11 @@ public record ControlPlaneConfig(
                 settings.text("DATABASE_USER", "scheduler"),
                 settings.text("DATABASE_PASSWORD", "scheduler"),
                 settings.number("SCHEDULING_INTERVAL_MILLIS", 100),
-                (int) settings.number("SCHEDULING_BATCH_SIZE", 1_000));
+                (int) settings.number("SCHEDULING_BATCH_SIZE", 1_000),
+                settings.number("RECONCILE_INTERVAL_MILLIS", 1_000),
+                // Five missed one-second heartbeats before a node counts as dead.
+                settings.number("HEARTBEAT_TIMEOUT_MILLIS", 5_000),
+                settings.number("RESEND_AFTER_MILLIS", 3_000));
     }
 
     private record Settings(Map<String, String> variables) {

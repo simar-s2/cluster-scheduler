@@ -3,6 +3,7 @@ package clusterscheduler.controlplane;
 import clusterscheduler.controlplane.database.Database;
 import clusterscheduler.controlplane.database.SchemaInitializer;
 import clusterscheduler.controlplane.delivery.AssignmentSender;
+import clusterscheduler.controlplane.reconcile.ReconcileLoop;
 import clusterscheduler.controlplane.scheduling.SchedulingLoop;
 import clusterscheduler.controlplane.state.AssignmentRepository;
 import clusterscheduler.controlplane.state.HeartbeatRepository;
@@ -24,8 +25,8 @@ public final class ControlPlane implements AutoCloseable {
     private final Database database;
     private final Server grpcServer;
     private final AssignmentSender assignmentSender;
-    // Every decision (placing tasks, and later declaring nodes dead) runs on
-    // this one thread, so decisions never race each other inside a replica.
+    // Every decision (placing tasks, declaring nodes dead) runs on this one
+    // thread, so decisions never race each other inside a replica.
     private final ScheduledExecutorService decisionThread =
             Executors.newSingleThreadScheduledExecutor(runnable -> new Thread(runnable, "decisions"));
 
@@ -53,7 +54,11 @@ public final class ControlPlane implements AutoCloseable {
         SchedulingLoop schedulingLoop = new SchedulingLoop(
                 database, jobRepository, nodeRepository, assignmentRepository, assignmentSender,
                 config.schedulingBatchSize());
+        ReconcileLoop reconcileLoop = new ReconcileLoop(
+                database, nodeRepository, assignmentRepository, assignmentSender,
+                config.heartbeatTimeoutMillis(), config.resendAfterMillis());
         controlPlane.repeatOnDecisionThread("scheduling", schedulingLoop::runOnce, config.schedulingIntervalMillis());
+        controlPlane.repeatOnDecisionThread("reconcile", reconcileLoop::runOnce, config.reconcileIntervalMillis());
         return controlPlane;
     }
 
