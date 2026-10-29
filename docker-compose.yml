@@ -1,5 +1,15 @@
 name: cluster-scheduler
 
+# Settings shared by the three control plane replicas.
+x-control-plane: &control-plane
+  build:
+    context: .
+    target: control-plane
+  image: cluster-scheduler/control-plane
+  depends_on:
+    postgres:
+      condition: service_healthy
+
 services:
   # Holds all cluster state: jobs, nodes, task assignments and the leader lease.
   postgres:
@@ -20,17 +30,24 @@ services:
       timeout: 2s
       retries: 15
 
+  # Three replicas: one leads, two stand by. Any of them serves the API.
   control-plane-1:
-    build:
-      context: .
-      target: control-plane
-    image: cluster-scheduler/control-plane
+    <<: *control-plane
     environment:
       REPLICA_ID: control-plane-1
       DATABASE_URL: jdbc:postgresql://postgres:5432/scheduler
-    depends_on:
-      postgres:
-        condition: service_healthy
+
+  control-plane-2:
+    <<: *control-plane
+    environment:
+      REPLICA_ID: control-plane-2
+      DATABASE_URL: jdbc:postgresql://postgres:5432/scheduler
+
+  control-plane-3:
+    <<: *control-plane
+    environment:
+      REPLICA_ID: control-plane-3
+      DATABASE_URL: jdbc:postgresql://postgres:5432/scheduler
 
   # Scale with: docker compose up --scale worker=N
   worker:
@@ -39,11 +56,13 @@ services:
       target: worker
     image: cluster-scheduler/worker
     environment:
-      CONTROL_PLANE_ADDRESSES: control-plane-1:9090
+      CONTROL_PLANE_ADDRESSES: control-plane-1:9090,control-plane-2:9090,control-plane-3:9090
       CPU_CAPACITY_MILLIS: 4000
       MEMORY_CAPACITY_MB: 8192
     depends_on:
       - control-plane-1
+      - control-plane-2
+      - control-plane-3
     deploy:
       replicas: 3
 
