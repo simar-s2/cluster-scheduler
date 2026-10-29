@@ -156,6 +156,21 @@ final class TestCluster implements AutoCloseable {
         });
     }
 
+    /** Runs a query that returns one piece of text. */
+    String queryText(String sql, Object... parameters) {
+        return database.inTransaction(connection -> {
+            try (PreparedStatement query = connection.prepareStatement(sql)) {
+                for (int i = 0; i < parameters.length; i++) {
+                    query.setObject(i + 1, parameters[i]);
+                }
+                try (ResultSet row = query.executeQuery()) {
+                    row.next();
+                    return row.getString(1);
+                }
+            }
+        });
+    }
+
     /** CPU held by active assignments, per node. */
     Map<String, Long> allocatedCpuByNode() {
         return database.inTransaction(connection -> {
