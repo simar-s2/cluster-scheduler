@@ -16,6 +16,12 @@ public final class Database implements AutoCloseable {
         config.setPassword(password);
         config.setMaximumPoolSize(10);
         config.setConnectionTimeout(2_000);
+        // If a replica freezes in the middle of a transaction (a long GC pause,
+        // or "docker pause"), its row locks would stay held for as long as it
+        // is frozen. A fenced transaction holds a lock on the lease row, so a
+        // frozen leader would block every takeover. PostgreSQL ends such a
+        // session after 2 seconds of silence and releases its locks.
+        config.setConnectionInitSql("SET idle_in_transaction_session_timeout = '2s'");
         this.dataSource = new HikariDataSource(config);
     }
 
