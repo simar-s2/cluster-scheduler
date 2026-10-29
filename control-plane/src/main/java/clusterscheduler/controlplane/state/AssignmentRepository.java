@@ -2,6 +2,7 @@ package clusterscheduler.controlplane.state;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,46 @@ public final class AssignmentRepository {
             insert.executeBatch();
         }
         return claimed;
+    }
+
+    /**
+     * Assignments on live nodes that no heartbeat has confirmed within the
+     * grace period. Either the send failed, or the leader that saved them died
+     * before sending. Sending them again is safe because workers ignore an
+     * assignment ID they have already seen.
+     */
+    public List<Assignment> findUnconfirmed(Connection connection, long olderThanMillis, int limit)
+            throws SQLException {
+        String sql = """
+                SELECT a.assignment_id, a.job_id, a.node_id, n.address,
+                       j.cpu_millis, j.memory_mb, j.duration_millis
+                FROM assignments a
+                JOIN nodes n ON n.node_id = a.node_id
+                JOIN jobs j ON j.job_id = a.job_id
+                WHERE a.state = 'ASSIGNED'
+                  AND n.status = 'ALIVE'
+                  AND a.assigned_at < now() - ? * interval '1 millisecond'
+                ORDER BY a.assigned_at
+                LIMIT ?
+                """;
+        try (PreparedStatement query = connection.prepareStatement(sql)) {
+            query.setLong(1, olderThanMillis);
+            query.setInt(2, limit);
+            try (ResultSet rows = query.executeQuery()) {
+                List<Assignment> assignments = new ArrayList<>();
+                while (rows.next()) {
+                    assignments.add(new Assignment(
+                            rows.getString("assignment_id"),
+                            rows.getString("job_id"),
+                            rows.getString("node_id"),
+                            rows.getString("address"),
+                            rows.getLong("cpu_millis"),
+                            rows.getLong("memory_mb"),
+                            rows.getLong("duration_millis")));
+                }
+                return assignments;
+            }
+        }
     }
 
     /** Moves each job from PENDING to SCHEDULED, and keeps the assignments whose job moved. */
