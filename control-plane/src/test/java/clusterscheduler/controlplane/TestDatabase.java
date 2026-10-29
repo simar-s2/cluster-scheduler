@@ -43,6 +43,8 @@ final class TestDatabase {
             database.inTransaction(connection -> {
                 try (Statement statement = connection.createStatement()) {
                     statement.execute("TRUNCATE assignments, jobs, nodes");
+                    statement.execute(
+                            "UPDATE leader_lease SET holder = NULL, epoch = 0, expires_at = '-infinity'");
                 }
                 return null;
             });

@@ -66,3 +66,18 @@ CREATE INDEX IF NOT EXISTS active_assignments_by_node
 -- Assignments no worker has confirmed yet, which the reconcile loop resends.
 CREATE INDEX IF NOT EXISTS unconfirmed_assignments
     ON assignments (assigned_at) WHERE state = 'ASSIGNED';
+
+-- The single leader lease. Whoever holds an unexpired lease is the leader.
+-- epoch goes up by one every time the lease changes hands, and is the
+-- fencing token for everything that leader writes.
+CREATE TABLE IF NOT EXISTS leader_lease (
+    lease_id   INT         PRIMARY KEY CHECK (lease_id = 1),
+    holder     TEXT,
+    epoch      BIGINT      NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL
+);
+
+-- Start with nobody holding it and an expiry in the past.
+INSERT INTO leader_lease (lease_id, holder, epoch, expires_at)
+VALUES (1, NULL, 0, '-infinity')
+ON CONFLICT (lease_id) DO NOTHING;
