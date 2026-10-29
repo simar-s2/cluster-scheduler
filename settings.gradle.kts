@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 
 include("proto")
 include("control-plane")
+include("worker")
