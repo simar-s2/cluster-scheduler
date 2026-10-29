@@ -73,26 +73,4 @@ public final class NodeRepository {
         });
     }
 
-    /**
-     * Records that the node is alive and how much it has free. Returns false
-     * if the control plane does not know this node, in which case the worker
-     * must register again.
-     */
-    public boolean recordHeartbeat(String nodeId, long freeCpuMillis, long freeMemoryMb) {
-        return database.inTransaction(connection -> {
-            String sql = """
-                    UPDATE nodes
-                    SET last_heartbeat_at = now(),
-                        reported_free_cpu_millis = ?,
-                        reported_free_memory_mb = ?
-                    WHERE node_id = ?
-                    """;
-            try (PreparedStatement update = connection.prepareStatement(sql)) {
-                update.setLong(1, freeCpuMillis);
-                update.setLong(2, freeMemoryMb);
-                update.setString(3, nodeId);
-                return update.executeUpdate() == 1;
-            }
-        });
-    }
 }

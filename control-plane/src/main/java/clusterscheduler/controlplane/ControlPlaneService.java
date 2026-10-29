@@ -1,7 +1,9 @@
 package clusterscheduler.controlplane;
 
 import clusterscheduler.controlplane.database.DatabaseException;
+import clusterscheduler.controlplane.state.HeartbeatRepository;
 import clusterscheduler.controlplane.state.JobRepository;
+import clusterscheduler.controlplane.state.NodeHeartbeat;
 import clusterscheduler.controlplane.state.NodeRepository;
 import clusterscheduler.proto.ControlPlaneGrpc;
 import clusterscheduler.proto.HeartbeatRequest;
@@ -24,10 +26,13 @@ final class ControlPlaneService extends ControlPlaneGrpc.ControlPlaneImplBase {
     private static final Logger log = LoggerFactory.getLogger(ControlPlaneService.class);
 
     private final NodeRepository nodeRepository;
+    private final HeartbeatRepository heartbeatRepository;
     private final JobRepository jobRepository;
 
-    ControlPlaneService(NodeRepository nodeRepository, JobRepository jobRepository) {
+    ControlPlaneService(
+            NodeRepository nodeRepository, HeartbeatRepository heartbeatRepository, JobRepository jobRepository) {
         this.nodeRepository = nodeRepository;
+        this.heartbeatRepository = heartbeatRepository;
         this.jobRepository = jobRepository;
     }
 
@@ -49,10 +54,12 @@ final class ControlPlaneService extends ControlPlaneGrpc.ControlPlaneImplBase {
     @Override
     public void heartbeat(HeartbeatRequest request, StreamObserver<HeartbeatResponse> responseObserver) {
         respond(responseObserver, () -> {
-            boolean nodeIsKnown = nodeRepository.recordHeartbeat(
+            boolean nodeIsKnown = heartbeatRepository.record(new NodeHeartbeat(
                     request.getNodeId(),
                     request.getFree().getCpuMillis(),
-                    request.getFree().getMemoryMb());
+                    request.getFree().getMemoryMb(),
+                    request.getRunningAssignmentIdsList(),
+                    request.getFinishedAssignmentIdsList()));
             return HeartbeatResponse.newBuilder().setMustReregister(!nodeIsKnown).build();
         });
     }
