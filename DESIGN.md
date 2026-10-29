@@ -189,3 +189,49 @@ The database is the source of truth. If the leader dies after writing, the next 
 
 **How do you make sure a finished task is counted exactly once?**
 Two halves. The worker resends a finished ID until a heartbeat succeeds (at least once). The control plane only finishes an assignment that is still active on that node, so a repeat matches no rows (at most once in effect). Together they act like exactly once without any distributed transaction.
+
+## Milestone 4: reconcile loop and node failure handling
+
+### What was built
+
+- **Node status** (`ALIVE`, `DEAD`) and a `LOST` assignment state.
+- **`NodeRepository.markExpiredNodesDead`.** In one transaction it marks every node with a heartbeat older than the timeout as `DEAD`, marks that node's active assignments `LOST`, and puts their jobs back to `PENDING`.
+- **`AssignmentRepository.findUnconfirmed`**, which finds assignments still `ASSIGNED` (no heartbeat has confirmed them) after a grace period, on live nodes.
+- **`ReconcileLoop`**, which runs every second on the decision thread. Each pass declares expired nodes dead, then resends unconfirmed assignments.
+- **Heartbeats from a `DEAD` node** now get `must_reregister = true`. The worker clears its node ID, stops every task, and registers as a new node.
+- **Defaults:** heartbeats every 1 s, a node is dead after 5 s of silence, reconcile every 1 s, resend after 3 s.
+- **`NodeFailureTest`** covers three cases:
+  - A crashed worker's tasks move to healthy nodes, and every job ends with exactly one active assignment.
+  - A worker whose heartbeats arrive too late is declared dead, stops its task, and comes back as a new node while the job runs elsewhere.
+  - An assignment that was saved but never sent (a leader dying between the two steps) gets delivered by the reconcile loop.
+
+### Why it is designed this way
+
+**The loop compares whole states instead of reacting to events.** Each pass asks "which live nodes have gone quiet?" and "which assignments has no one confirmed?" against the current tables. It never asks "what happened since last time?". A pass that is skipped (the replica was busy, or there was no leader) loses nothing, because the next pass sees the same facts. This is the Kubernetes controller pattern: level-triggered, not edge-triggered.
+
+**Rescheduling just puts the job back in the queue.** The reconcile loop never picks a new node itself. It returns the job to `PENDING`, and the normal scheduling loop places it with best fit, like any other job. One code path places tasks, so there is one place to get placement right. Requeued jobs keep their original `submitted_at`, so they go to the front of the queue.
+
+**Declaring a node dead and receiving its heartbeat cannot both win.** The heartbeat does `UPDATE nodes ... WHERE node_id = ? AND status = 'ALIVE'`. The leader does `UPDATE nodes SET status = 'DEAD' WHERE status = 'ALIVE' AND last_heartbeat_at < now() - timeout`. Both update the same row, so PostgreSQL makes one wait for the other. When the second one runs, PostgreSQL evaluates its `WHERE` clause again against the row the first one committed. Either the heartbeat landed first (the node is no longer expired and stays alive) or the node is already `DEAD` (the heartbeat matches nothing and the worker is told to register again). There is no in-between.
+
+**Dead is permanent.** A `DEAD` node never becomes `ALIVE` again. A worker that comes back registers as a brand-new node. Otherwise the system would need a "dead but maybe still running things" state, and every query would have to reason about it.
+
+**Only unconfirmed assignments are resent, and resending is harmless.** An assignment stays `ASSIGNED` until a heartbeat lists it. If that has not happened after 3 seconds, the send failed or never happened. Workers ignore an assignment ID they have already seen, so an unnecessary resend costs one RPC and changes nothing.
+
+**Choosing the timeout is a tradeoff.** Five seconds is five missed heartbeats. A shorter timeout recovers faster but wrongly kills nodes during a GC pause or a network blip, and each false positive moves every task on that node. A longer timeout leaves tasks down for longer when a node really dies. Recovery time comes out to roughly the timeout plus up to one reconcile interval, one scheduling pass and one heartbeat to confirm. Milestone 7 measures it.
+
+### Tradeoffs
+
+- **A partitioned node keeps running its tasks until it can reach the control plane again.** The control plane is right to move them after 5 s, and the database never shows a job with two active assignments. But the cut-off worker does not know it has been declared dead until its next successful heartbeat, so for that window the task runs in two places. The standard fix is self-fencing: a worker that has gone longer than the timeout without a successful heartbeat stops its own tasks. It needs the worker's limit to be safely shorter than the control plane's, despite clock drift, so it is listed here as a known gap rather than built.
+- **The timeout is a fixed number.** Adaptive failure detectors (phi accrual, as in Cassandra) adjust to observed heartbeat jitter. A fixed timeout is easier to explain and to test.
+- **A running task that silently vanishes from a worker is not detected.** Heartbeats list running tasks, and a missing one could be treated as lost. In this design a worker only loses tasks by restarting, and a restart creates a new node ID, so the old node times out instead.
+
+### Interview questions
+
+**What if a heartbeat arrives at the exact moment the leader declares that node dead?**
+Both are `UPDATE`s on the same `nodes` row with their condition in the `WHERE` clause. PostgreSQL's row lock serializes them and re-checks the condition for whichever goes second. Either the heartbeat wins and the node stays alive, or the node is already dead and the heartbeat is told to register again.
+
+**Why does rescheduling put jobs back in the queue instead of moving them straight to a new node?**
+So that only one piece of code decides placement. The scheduler already does best fit, checks capacity and claims jobs atomically. Duplicating that in the failure path would be a second place for bugs, and it would be a worse placement than what the scheduler does with up-to-date free space.
+
+**A node is declared dead but was actually alive. What happens?**
+Its jobs are already placed elsewhere. On its next heartbeat it gets `must_reregister`, stops all its tasks, and registers as a new, empty node. Until that heartbeat gets through, it may still be running those tasks; a self-fencing timeout on the worker would close that window.
