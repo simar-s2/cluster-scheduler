@@ -31,11 +31,17 @@ message RegisterNodeRequest {
   string address = 1;
   // Total CPU and memory this node offers to tasks.
   Resources capacity = 2;
+  // A new random UUID each time the worker starts registering, which becomes
+  // the node ID. Retries of the same registration send the same value, so a
+  // retry after a lost response finds the node it already created instead of
+  // creating a second one that would never send a heartbeat.
+  string registration_id = 3;
 }
 
 message RegisterNodeResponse {
-  // A new ID for every registration. A worker that restarts has lost its
-  // tasks, so it registers again as a new node instead of reusing its old ID.
+  // The node ID: a new one for every registration. A worker that restarts has
+  // lost its tasks, so it registers again as a new node instead of reusing
+  // its old ID.
   string node_id = 1;
 }
 
