@@ -42,4 +42,29 @@ public final class LeaseRepository {
             }
         });
     }
+
+    /**
+     * Extends the lease this replica holds for this epoch. Returns false if
+     * the lease has expired or belongs to a newer term, which means this
+     * replica is no longer the leader.
+     *
+     * An expired lease is never renewed, even if nobody has taken it yet.
+     * Getting leadership back after expiry goes through tryAcquire and starts
+     * a new epoch, so "expired" always means "that term is over".
+     */
+    public boolean renew(String replicaId, long epoch, long leaseDurationMillis) {
+        return database.inTransaction(connection -> {
+            String sql = """
+                    UPDATE leader_lease
+                    SET expires_at = now() + ? * interval '1 millisecond'
+                    WHERE lease_id = 1 AND holder = ? AND epoch = ? AND expires_at > now()
+                    """;
+            try (PreparedStatement update = connection.prepareStatement(sql)) {
+                update.setLong(1, leaseDurationMillis);
+                update.setString(2, replicaId);
+                update.setLong(3, epoch);
+                return update.executeUpdate() == 1;
+            }
+        });
+    }
 }
