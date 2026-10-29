@@ -80,3 +80,55 @@ Those calls record facts, not decisions, and all state lives in PostgreSQL, so a
 
 **Why does a restarted worker get a new node ID instead of keeping its old one?**
 A restart wipes the worker's in-memory tasks. If it kept its ID, the control plane would believe the old tasks were still running there. With a fresh ID, the old node simply times out like any dead node and its tasks are rescheduled through the normal path, with no special case.
+
+## Milestone 2: worker registration and heartbeats
+
+### What was built
+
+- **`control-plane` module.**
+  - `Database` wraps a HikariCP connection pool and has one helper, `inTransaction`, which commits on success and rolls back on any exception.
+  - `SchemaInitializer` applies `schema.sql` at startup.
+  - `NodeRepository` inserts nodes and records heartbeats.
+  - `ControlPlaneService` is the gRPC API. `ControlPlane` wires the pieces together, and `ControlPlaneMain` starts it from environment variables.
+- **`worker` module.**
+  - `ControlPlaneClient` calls the control plane and moves to the next replica when one fails.
+  - `HeartbeatLoop` registers the worker and then sends a heartbeat every second.
+  - `WorkerNode` wires it together, and `WorkerMain` starts it.
+- **`NodeRegistrationTest`**, the first integration test. It runs a real control plane and a real worker against PostgreSQL in a Testcontainers container, and checks registration, heartbeats, and re-registration with a new ID when the control plane no longer knows the node.
+- **One multi-stage `Dockerfile`** with two targets (`control-plane`, `worker`), plus compose services for one control plane and three workers (`--scale worker=N` for more).
+
+### Why it is designed this way
+
+**State is in PostgreSQL from the first milestone, not in memory first.** The design says all state lives in PostgreSQL, and the plan for any replica to accept heartbeats only works if the state is shared. An in-memory store would have been thrown away in milestone 4.
+
+**Plain JDBC, no ORM.** Every SQL statement the system runs is visible in the repository classes. That matters later, because correctness depends on exactly which rows each statement locks and which conditions it checks. An ORM would hide that.
+
+**The heartbeat timestamp is set by the database (`now()`), never by a replica.** Three replicas have three clocks. If replica A writes heartbeats with its clock and replica B checks them against its own, a few seconds of clock skew could make a healthy node look dead. Using one clock, PostgreSQL's, for both the write and the check removes the problem.
+
+**Registration happens inside the heartbeat loop.** If the worker has no node ID, the next tick registers first. That gives retries for free: if no replica is reachable, the tick fails, gets logged, and the next tick tries again. When the control plane says `must_reregister`, the worker clears its ID and the same path registers it again.
+
+**The scheduled task never throws.** `ScheduledExecutorService` silently cancels a repeating task the first time it throws. A worker would then stop heartbeating forever with nothing in the logs. `HeartbeatLoop` catches every runtime exception and logs it.
+
+**The worker sticks to one replica.** It starts at a random replica, to spread load, and only moves to the next replica when a call fails with `UNAVAILABLE` or `DEADLINE_EXCEEDED`. Errors such as `INVALID_ARGUMENT` would fail on every replica, so it does not retry those.
+
+**The schema is created at startup under an advisory lock.** Every replica runs `CREATE TABLE IF NOT EXISTS`, but two of those running at the same moment can still collide inside PostgreSQL. `pg_advisory_xact_lock` makes replicas take turns.
+
+**`WorkerNode.close()` behaves like a crash.** It just stops, without telling the control plane. That is what the node failure tests need, and the system never relies on a clean goodbye anyway.
+
+### Tradeoffs
+
+- **No migration tool.** `schema.sql` describes the current schema, and every run starts from an empty database. A real deployment would need versioned migrations, for example with Flyway.
+- **Every heartbeat is a database transaction.** That is simple and always consistent. At around a hundred nodes it is a negligible load; at many thousands you would batch heartbeats.
+- **Blocking gRPC stubs.** One thread waits per call. The code is easier to follow than async callbacks, and the call rates here are low.
+- **Sticky replica choice can be uneven.** Workers spread out randomly at start but do not rebalance. For writes that all end up in the same PostgreSQL, that is fine.
+
+### Interview questions
+
+**Why does the database set the heartbeat time instead of the replica that received it?**
+Because the time is later compared against "now" to decide whether a node is dead, possibly by a different replica. Two clocks with skew between them could declare a live node dead. With `now()` in PostgreSQL, the write and the check use the same clock.
+
+**What happens if the heartbeat code throws an exception?**
+Without the catch, `ScheduledExecutorService` would cancel the repeating task and the worker would silently stop heartbeating. The control plane would then declare it dead even though the process is healthy. The loop catches and logs failures, so the next tick runs normally.
+
+**Why do workers retry on another replica only for some errors?**
+`UNAVAILABLE` and `DEADLINE_EXCEEDED` mean "this replica cannot answer right now", so another replica might succeed. `INVALID_ARGUMENT` means the request itself is wrong, and every replica would reject it the same way.
