@@ -132,3 +132,60 @@ Without the catch, `ScheduledExecutorService` would cancel the repeating task an
 
 **Why do workers retry on another replica only for some errors?**
 `UNAVAILABLE` and `DEADLINE_EXCEEDED` mean "this replica cannot answer right now", so another replica might succeed. `INVALID_ARGUMENT` means the request itself is wrong, and every replica would reject it the same way.
+
+## Milestone 3: scheduler with bin packing
+
+### What was built
+
+- **Tables.**
+  - `jobs` holds the desired state: `PENDING`, `SCHEDULED` or `FINISHED`. A partial index serves the pending queue in arrival order.
+  - `assignments` holds every placement ever made: `ASSIGNED`, then `RUNNING`, then `FINISHED`. A partial unique index allows at most one active assignment per job.
+- **`BestFitScheduler`**, a pure function that takes pending jobs and node free space and returns placements. It has its own unit tests.
+- **`SchedulingLoop`**, which every 100 ms reads up to 1,000 pending jobs and every node's free space, asks the scheduler for placements, saves them, and hands them to `AssignmentSender`.
+- **`AssignmentRepository.saveNew`**, which claims each job (`PENDING` to `SCHEDULED`) and inserts its assignment in the same transaction.
+- **`AssignmentSender` and `WorkerChannels`**, which push `AssignTask` to workers from a pool of 16 threads.
+- **Worker side.**
+  - `TaskRunner` runs simulated tasks: each holds its CPU and memory for its duration.
+  - `WorkerService` serves `AssignTask`.
+  - `NodeIdentity` holds the current node ID.
+  - Heartbeats now carry free space plus running and finished assignment IDs.
+- **`HeartbeatRepository`**, which applies one heartbeat in one transaction: node alive, assignments now running, assignments and jobs finished.
+- **Integration tests** (`SchedulingTest`): 12 jobs fill three nodes exactly with no overcommit; finished jobs free space for waiting ones; a job too big for any node waits without blocking smaller ones; a resubmitted job ID creates one job.
+
+### Why it is designed this way
+
+**Best fit, scored by leftover share.** For each job, in queue order, the scheduler picks the node with the least space left after placing it. "Least space" needs one number for two resources, so it adds the share of CPU left (leftover millicores / node CPU capacity) and the share of memory left. Shares make a millicore and a megabyte comparable. Best fit fills nearly full nodes first and keeps big gaps open for big jobs, which is what raises utilization. Worst fit, which spreads load, would leave many medium gaps that no large job fits.
+
+**A job that fits nowhere is skipped, not waited on.** If the head of the queue is too big for every node, smaller jobs behind it still get placed. That keeps utilization high. The cost is that a very large job can wait a long time while small jobs keep taking the space it needs. Fixing that (reservations, aging) is beyond this project.
+
+**Free space comes from the assignments table, not from heartbeats.** A heartbeat is up to one interval old. If the scheduler trusted reported free space, it would place a second wave of tasks on space it had just given away. Capacity minus the requests of active assignments is exact the moment a placement commits. Reported free space is still stored, for comparison.
+
+**Save, then send.** The leader commits the assignment to PostgreSQL before calling the worker. If it crashes in between, the record exists and the next leader resends it (milestone 4). With the opposite order, a crash could leave a task running that the database knows nothing about, and the scheduler would happily place the job again.
+
+**Claiming a job is a compare-and-set.** `UPDATE jobs SET state = 'SCHEDULED' WHERE job_id = ? AND state = 'PENDING'` only succeeds once per job, and an assignment is only inserted for a successful claim. The unique index on active assignments is a second, independent guard that PostgreSQL enforces no matter what the code does.
+
+**All decisions run on one thread.** Scheduling (and, in milestone 4, declaring nodes dead) runs on a single thread per replica. Two decisions inside one replica can never interleave, so there are no locks to reason about between them.
+
+**Finished reports are sent at least once and applied at most once.** The worker keeps a finished ID until a heartbeat carrying it succeeds. The control plane only finishes assignments that are still active on that node. Sending twice is harmless, and losing a heartbeat loses nothing.
+
+**Workers remember every assignment ID, including finished ones.** A delayed duplicate `AssignTask` can arrive after the task finished. If the worker only remembered running tasks, it would run the task a second time.
+
+**`AssignTaskRequest` carries the node ID.** Docker reuses IP addresses. If node A dies and a new worker B gets A's IP, the leader may still try to send A's assignment to that address. B checks the node ID, answers `RESULT_WRONG_NODE`, and does not start a task the database thinks is on A.
+
+### Tradeoffs
+
+- **One pass handles at most 1,000 jobs and costs jobs × nodes comparisons.** At 1,000 × 100 that is 100,000 cheap comparisons, well under a millisecond. Thousands of nodes would call for indexing nodes by free space.
+- **The scheduler reads outside the write transaction.** The free space it sees can only be stale in the safe direction (a task finished and freed space), because the only thing that adds load is this same thread.
+- **The dedupe set on workers grows forever.** It holds one string per assignment ever received, which is fine for a run of thousands of tasks. A long-lived worker would keep only recent IDs, for example everything newer than a timestamp.
+- **Tasks are simulated.** Nothing actually uses the CPU. The scheduler's correctness does not depend on what a task does, and this way one laptop can run thousands of them.
+
+### Interview questions
+
+**How does best fit compare CPU with memory?**
+It converts both to shares of the node's capacity and adds them: (CPU left / CPU capacity) + (memory left / memory capacity). The node with the smallest sum is the tightest fit. Without the conversion, memory in megabytes would dominate CPU in millicores just because the numbers are bigger.
+
+**Why write the assignment to the database before sending it to the worker?**
+The database is the source of truth. If the leader dies after writing, the next leader sees the assignment and delivers it. If it sent first and died before writing, a task would run without any record, the job would still look pending, and it would be placed a second time.
+
+**How do you make sure a finished task is counted exactly once?**
+Two halves. The worker resends a finished ID until a heartbeat succeeds (at least once). The control plane only finishes an assignment that is still active on that node, so a repeat matches no rows (at most once in effect). Together they act like exactly once without any distributed transaction.
