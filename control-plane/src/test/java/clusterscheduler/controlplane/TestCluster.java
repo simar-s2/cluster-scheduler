@@ -53,11 +53,15 @@ final class TestCluster implements AutoCloseable {
     }
 
     WorkerNode addWorker() throws IOException {
+        return addWorker(100);
+    }
+
+    WorkerNode addWorker(long heartbeatIntervalMillis) throws IOException {
         List<String> replicaAddresses = controlPlanes.stream()
                 .map(controlPlane -> "localhost:" + controlPlane.grpcPort())
                 .toList();
-        WorkerNode worker = WorkerNode.start(
-                new WorkerConfig(replicaAddresses, "127.0.0.1", 0, WORKER_CPU_MILLIS, WORKER_MEMORY_MB, 100));
+        WorkerNode worker = WorkerNode.start(new WorkerConfig(
+                replicaAddresses, "127.0.0.1", 0, WORKER_CPU_MILLIS, WORKER_MEMORY_MB, heartbeatIntervalMillis));
         workers.add(worker);
         return worker;
     }
@@ -116,6 +120,18 @@ final class TestCluster implements AutoCloseable {
             }
         }
         throw new AssertionError("No replica accepted job " + jobId);
+    }
+
+    /** Runs any write, for tests that set up a state directly. */
+    void execute(String sql, Object... parameters) {
+        database.inTransaction(connection -> {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                for (int i = 0; i < parameters.length; i++) {
+                    statement.setObject(i + 1, parameters[i]);
+                }
+                return statement.executeUpdate();
+            }
+        });
     }
 
     /** Runs a query that returns one number, such as SELECT count(*). */
