@@ -2,6 +2,7 @@ package clusterscheduler.controlplane;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 
 /** Settings for one control plane replica. */
 public record ControlPlaneConfig(
@@ -11,23 +12,30 @@ public record ControlPlaneConfig(
         String databaseUser,
         String databasePassword) {
 
-    /** Reads the settings from environment variables, with defaults for local runs. */
-    public static ControlPlaneConfig fromEnvironment() {
+    /**
+     * Reads the settings from a map of variables, such as System.getenv().
+     * Anything missing gets a default suited to local runs, so tests only set
+     * what they care about.
+     */
+    public static ControlPlaneConfig fromVariables(Map<String, String> variables) {
+        Settings settings = new Settings(variables);
         return new ControlPlaneConfig(
-                text("REPLICA_ID", hostname()),
-                number("GRPC_PORT", 9090),
-                text("DATABASE_URL", "jdbc:postgresql://localhost:5432/scheduler"),
-                text("DATABASE_USER", "scheduler"),
-                text("DATABASE_PASSWORD", "scheduler"));
+                settings.text("REPLICA_ID", hostname()),
+                (int) settings.number("GRPC_PORT", 9090),
+                settings.text("DATABASE_URL", "jdbc:postgresql://localhost:5432/scheduler"),
+                settings.text("DATABASE_USER", "scheduler"),
+                settings.text("DATABASE_PASSWORD", "scheduler"));
     }
 
-    private static String text(String name, String defaultValue) {
-        String value = System.getenv(name);
-        return value == null || value.isBlank() ? defaultValue : value;
-    }
+    private record Settings(Map<String, String> variables) {
+        String text(String name, String defaultValue) {
+            String value = variables.get(name);
+            return value == null || value.isBlank() ? defaultValue : value;
+        }
 
-    private static int number(String name, int defaultValue) {
-        return Integer.parseInt(text(name, Integer.toString(defaultValue)));
+        long number(String name, long defaultValue) {
+            return Long.parseLong(text(name, Long.toString(defaultValue)));
+        }
     }
 
     private static String hostname() {

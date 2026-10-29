@@ -7,7 +7,7 @@ public final class WorkerMain {
     private WorkerMain() {}
 
     public static void main(String[] args) throws InterruptedException {
-        WorkerNode workerNode = WorkerNode.start(WorkerConfig.fromEnvironment());
+        WorkerNode workerNode = WorkerNode.start(WorkerConfig.fromVariables(System.getenv()));
         CountDownLatch stopped = new CountDownLatch(1);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             workerNode.close();

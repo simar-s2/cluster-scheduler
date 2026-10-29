@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class NodeRegistrationTest {
     void startControlPlane() throws Exception {
         TestDatabase.reset();
         database = TestDatabase.connect();
-        controlPlane = ControlPlane.start(TestDatabase.configForReplica("replica-1"));
+        controlPlane = ControlPlane.start(TestDatabase.configForReplica("replica-1", Map.of()));
         worker = WorkerNode.start(new WorkerConfig(
                 List.of("localhost:" + controlPlane.grpcPort()), "127.0.0.1", 0, 4_000, 8_192, 100));
     }

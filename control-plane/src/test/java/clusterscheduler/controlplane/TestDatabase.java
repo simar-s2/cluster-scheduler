@@ -3,6 +3,8 @@ package clusterscheduler.controlplane;
 import clusterscheduler.controlplane.database.Database;
 import clusterscheduler.controlplane.database.SchemaInitializer;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 /**
@@ -23,9 +25,15 @@ final class TestDatabase {
         return new Database(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
     }
 
-    static ControlPlaneConfig configForReplica(String replicaId) {
-        return new ControlPlaneConfig(
-                replicaId, 0, POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
+    /** Settings for an in-process replica: a random free port and this test database. */
+    static ControlPlaneConfig configForReplica(String replicaId, Map<String, String> overrides) {
+        Map<String, String> variables = new HashMap<>(overrides);
+        variables.put("REPLICA_ID", replicaId);
+        variables.put("GRPC_PORT", "0");
+        variables.put("DATABASE_URL", POSTGRES.getJdbcUrl());
+        variables.put("DATABASE_USER", POSTGRES.getUsername());
+        variables.put("DATABASE_PASSWORD", POSTGRES.getPassword());
+        return ControlPlaneConfig.fromVariables(variables);
     }
 
     /** Creates the schema if needed and deletes every row, so each test starts empty. */

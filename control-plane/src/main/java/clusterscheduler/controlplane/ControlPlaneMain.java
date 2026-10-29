@@ -10,7 +10,7 @@ public final class ControlPlaneMain {
     private ControlPlaneMain() {}
 
     public static void main(String[] args) throws Exception {
-        ControlPlaneConfig config = ControlPlaneConfig.fromEnvironment();
+        ControlPlaneConfig config = ControlPlaneConfig.fromVariables(System.getenv());
         ControlPlane controlPlane = ControlPlane.start(config);
         log.info("Control plane replica {} listening on port {}", config.replicaId(), controlPlane.grpcPort());
         Runtime.getRuntime().addShutdownHook(new Thread(controlPlane::close));
