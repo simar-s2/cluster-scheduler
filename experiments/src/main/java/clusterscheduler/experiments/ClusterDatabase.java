@@ -60,6 +60,20 @@ final class ClusterDatabase implements AutoCloseable {
         }
     }
 
+    /** One decimal number per row, for example a duration in seconds per job. */
+    List<Double> queryDecimals(String sql, Object... parameters) {
+        try (PreparedStatement query = prepare(sql, parameters);
+                ResultSet rows = query.executeQuery()) {
+            List<Double> values = new ArrayList<>();
+            while (rows.next()) {
+                values.add(rows.getDouble(1));
+            }
+            return values;
+        } catch (SQLException failure) {
+            throw new IllegalStateException(failure);
+        }
+    }
+
     /** Several numbers from one row, for samples that must be taken at the same moment. */
     long[] queryNumbers(String sql, Object... parameters) {
         try (PreparedStatement query = prepare(sql, parameters);

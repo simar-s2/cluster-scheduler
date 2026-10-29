@@ -59,6 +59,31 @@ final class DockerCompose {
         run("docker", "start", containerId);
     }
 
+    /** Memory each of the given containers uses right now, in MiB, as docker stats reports it. */
+    List<Double> memoryUsageMib(List<String> containerIds) {
+        List<String> command = new ArrayList<>(List.of("docker", "stats", "--no-stream", "--format", "{{.MemUsage}}"));
+        command.addAll(containerIds);
+        List<Double> usage = new ArrayList<>();
+        for (String line : run(command.toArray(String[]::new)).trim().split("\n")) {
+            // A line looks like "43.2MiB / 7.654GiB"; the first part is the usage.
+            usage.add(toMib(line.split("/")[0].trim()));
+        }
+        return usage;
+    }
+
+    private static double toMib(String amount) {
+        if (amount.endsWith("GiB")) {
+            return Double.parseDouble(amount.replace("GiB", "")) * 1024;
+        }
+        if (amount.endsWith("MiB")) {
+            return Double.parseDouble(amount.replace("MiB", ""));
+        }
+        if (amount.endsWith("KiB")) {
+            return Double.parseDouble(amount.replace("KiB", "")) / 1024;
+        }
+        throw new IllegalArgumentException("Unexpected memory amount " + amount);
+    }
+
     /** Everything the given services have logged, across restarts. */
     String logs(String... services) {
         List<String> command = new ArrayList<>(List.of("docker", "compose", "logs", "--no-color"));
