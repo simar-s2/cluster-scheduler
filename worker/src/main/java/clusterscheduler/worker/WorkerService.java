@@ -26,11 +26,13 @@ final class WorkerService extends WorkerGrpc.WorkerImplBase {
     private final TaskRunner taskRunner;
     private final NodeIdentity identity;
     private final EpochFence epochFence;
+    private final ExecutionLog executionLog;
 
-    WorkerService(TaskRunner taskRunner, NodeIdentity identity, EpochFence epochFence) {
+    WorkerService(TaskRunner taskRunner, NodeIdentity identity, EpochFence epochFence, ExecutionLog executionLog) {
         this.taskRunner = taskRunner;
         this.identity = identity;
         this.epochFence = epochFence;
+        this.executionLog = executionLog;
     }
 
     @Override
@@ -43,6 +45,8 @@ final class WorkerService extends WorkerGrpc.WorkerImplBase {
         if (!epochFence.admit(request.getLeaderEpoch())) {
             log.warn("FENCED: rejected assignment {} from stale epoch {}",
                     request.getAssignmentId(), request.getLeaderEpoch());
+            executionLog.rejectedStaleEpoch(
+                    request.getNodeId(), request.getAssignmentId(), request.getJobId(), request.getLeaderEpoch());
             return Result.RESULT_STALE_EPOCH;
         }
         if (!request.getNodeId().equals(identity.current())) {
@@ -51,10 +55,13 @@ final class WorkerService extends WorkerGrpc.WorkerImplBase {
             return Result.RESULT_WRONG_NODE;
         }
         boolean started = taskRunner.startIfNew(
+                request.getNodeId(),
                 request.getAssignmentId(),
+                request.getJobId(),
                 request.getRequested().getCpuMillis(),
                 request.getRequested().getMemoryMb(),
-                request.getDurationMillis());
+                request.getDurationMillis(),
+                request.getLeaderEpoch());
         return started ? Result.RESULT_STARTED : Result.RESULT_DUPLICATE;
     }
 }

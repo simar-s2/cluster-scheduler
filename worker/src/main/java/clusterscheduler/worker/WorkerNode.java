@@ -5,12 +5,14 @@ import io.grpc.Server;
 import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Path;
 import java.util.List;
 
 /** One worker node: builds every component and owns their lifecycle. */
 public final class WorkerNode implements AutoCloseable {
     private final Server grpcServer;
     private final TaskRunner taskRunner;
+    private final ExecutionLog executionLog;
     private final NodeIdentity identity;
     private final ControlPlaneClient controlPlaneClient;
     private final HeartbeatLoop heartbeatLoop;
@@ -18,11 +20,13 @@ public final class WorkerNode implements AutoCloseable {
     private WorkerNode(
             Server grpcServer,
             TaskRunner taskRunner,
+            ExecutionLog executionLog,
             NodeIdentity identity,
             ControlPlaneClient controlPlaneClient,
             HeartbeatLoop heartbeatLoop) {
         this.grpcServer = grpcServer;
         this.taskRunner = taskRunner;
+        this.executionLog = executionLog;
         this.identity = identity;
         this.controlPlaneClient = controlPlaneClient;
         this.heartbeatLoop = heartbeatLoop;
@@ -33,13 +37,19 @@ public final class WorkerNode implements AutoCloseable {
                 .setCpuMillis(config.cpuCapacityMillis())
                 .setMemoryMb(config.memoryCapacityMb())
                 .build();
-        TaskRunner taskRunner = new TaskRunner(config.cpuCapacityMillis(), config.memoryCapacityMb());
         NodeIdentity identity = new NodeIdentity();
         ControlPlaneClient controlPlaneClient = new ControlPlaneClient(config.controlPlaneAddresses());
+        // One file per node, named after its host and configured port.
+        ExecutionLog executionLog = config.executionLogDirectory().isEmpty()
+                ? ExecutionLog.disabled()
+                : ExecutionLog.appendingTo(Path.of(config.executionLogDirectory(),
+                        config.advertisedHost() + "-" + config.grpcPort() + ".jsonl"));
+        TaskRunner taskRunner =
+                new TaskRunner(config.cpuCapacityMillis(), config.memoryCapacityMb(), executionLog);
 
         Server grpcServer = NettyServerBuilder
                 .forAddress(new InetSocketAddress(config.grpcBindHost(), config.grpcPort()))
-                .addService(new WorkerService(taskRunner, identity, new EpochFence()))
+                .addService(new WorkerService(taskRunner, identity, new EpochFence(), executionLog))
                 .build()
                 .start();
 
@@ -48,7 +58,7 @@ public final class WorkerNode implements AutoCloseable {
         HeartbeatLoop heartbeatLoop = new HeartbeatLoop(
                 controlPlaneClient, taskRunner, identity, address, capacity, config.heartbeatIntervalMillis());
         heartbeatLoop.start();
-        return new WorkerNode(grpcServer, taskRunner, identity, controlPlaneClient, heartbeatLoop);
+        return new WorkerNode(grpcServer, taskRunner, executionLog, identity, controlPlaneClient, heartbeatLoop);
     }
 
     /** The current node ID, or null while the worker is not registered. */
@@ -69,6 +79,7 @@ public final class WorkerNode implements AutoCloseable {
         heartbeatLoop.close();
         grpcServer.shutdownNow();
         taskRunner.close();
+        executionLog.close();
         controlPlaneClient.close();
     }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 class TaskRunnerTest {
-    private final TaskRunner taskRunner = new TaskRunner(4_000, 8_192);
+    private final TaskRunner taskRunner = new TaskRunner(4_000, 8_192, ExecutionLog.disabled());
 
     @AfterEach
     void stopTimer() {
@@ -18,8 +18,8 @@ class TaskRunnerTest {
 
     @Test
     void runningTasksHoldTheirResources() {
-        taskRunner.startIfNew("a1", 1_000, 2_000, 60_000);
-        taskRunner.startIfNew("a2", 500, 1_000, 60_000);
+        start("a1", 1_000, 2_000, 60_000);
+        start("a2", 500, 1_000, 60_000);
 
         TaskRunner.Snapshot snapshot = taskRunner.snapshot();
         assertEquals(2_500, snapshot.freeCpuMillis());
@@ -29,23 +29,23 @@ class TaskRunnerTest {
 
     @Test
     void theSameAssignmentStartsOnlyOnce() {
-        assertTrue(taskRunner.startIfNew("a1", 1_000, 2_000, 60_000));
-        assertFalse(taskRunner.startIfNew("a1", 1_000, 2_000, 60_000));
+        assertTrue(start("a1", 1_000, 2_000, 60_000));
+        assertFalse(start("a1", 1_000, 2_000, 60_000));
 
         assertEquals(3_000, taskRunner.snapshot().freeCpuMillis());
     }
 
     @Test
     void aFinishedAssignmentIsStillADuplicate() throws InterruptedException {
-        taskRunner.startIfNew("a1", 1_000, 2_000, 0);
+        start("a1", 1_000, 2_000, 0);
         waitUntilFinished("a1");
 
-        assertFalse(taskRunner.startIfNew("a1", 1_000, 2_000, 0));
+        assertFalse(start("a1", 1_000, 2_000, 0));
     }
 
     @Test
     void finishedTasksAreReportedUntilAcknowledged() throws InterruptedException {
-        taskRunner.startIfNew("a1", 1_000, 2_000, 0);
+        start("a1", 1_000, 2_000, 0);
         waitUntilFinished("a1");
 
         assertEquals(List.of("a1"), taskRunner.snapshot().finishedAssignmentIds());
@@ -54,6 +54,10 @@ class TaskRunnerTest {
         taskRunner.markFinishedReported(List.of("a1"));
         assertEquals(List.of(), taskRunner.snapshot().finishedAssignmentIds());
         assertEquals(4_000, taskRunner.snapshot().freeCpuMillis());
+    }
+
+    private boolean start(String assignmentId, long cpuMillis, long memoryMb, long durationMillis) {
+        return taskRunner.startIfNew("node-1", assignmentId, "job-" + assignmentId, cpuMillis, memoryMb, durationMillis, 1);
     }
 
     private void waitUntilFinished(String assignmentId) throws InterruptedException {
@@ -68,12 +72,12 @@ class TaskRunnerTest {
 
     @Test
     void stopAllDropsRunningTasksButStillRemembersTheirIds() {
-        taskRunner.startIfNew("a1", 1_000, 2_000, 60_000);
+        start("a1", 1_000, 2_000, 60_000);
 
         taskRunner.stopAll();
 
         assertEquals(List.of(), taskRunner.snapshot().runningAssignmentIds());
         assertEquals(4_000, taskRunner.snapshot().freeCpuMillis());
-        assertFalse(taskRunner.startIfNew("a1", 1_000, 2_000, 60_000));
+        assertFalse(start("a1", 1_000, 2_000, 60_000));
     }
 }

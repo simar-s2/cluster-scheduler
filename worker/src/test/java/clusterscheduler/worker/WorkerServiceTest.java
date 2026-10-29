@@ -14,9 +14,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class WorkerServiceTest {
-    private final TaskRunner taskRunner = new TaskRunner(4_000, 8_192);
+    private final TaskRunner taskRunner = new TaskRunner(4_000, 8_192, ExecutionLog.disabled());
     private final NodeIdentity identity = new NodeIdentity();
-    private final WorkerService service = new WorkerService(taskRunner, identity, new EpochFence());
+    private final WorkerService service = new WorkerService(taskRunner, identity, new EpochFence(), ExecutionLog.disabled());
 
     @BeforeEach
     void register() {

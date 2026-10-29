@@ -14,7 +14,8 @@ public record WorkerConfig(
         int grpcPort,
         long cpuCapacityMillis,
         long memoryCapacityMb,
-        long heartbeatIntervalMillis) {
+        long heartbeatIntervalMillis,
+        String executionLogDirectory) {
 
     /**
      * Reads the settings from a map of variables, such as System.getenv().
@@ -31,7 +32,9 @@ public record WorkerConfig(
                 (int) settings.number("GRPC_PORT", 9100),
                 settings.number("CPU_CAPACITY_MILLIS", 4_000),
                 settings.number("MEMORY_CAPACITY_MB", 8_192),
-                settings.number("HEARTBEAT_INTERVAL_MILLIS", 1_000));
+                settings.number("HEARTBEAT_INTERVAL_MILLIS", 1_000),
+                // Empty means no execution log.
+                settings.text("EXECUTION_LOG_DIR", ""));
     }
 
     private record Settings(Map<String, String> variables) {

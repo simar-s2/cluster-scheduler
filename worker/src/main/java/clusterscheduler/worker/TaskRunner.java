@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 final class TaskRunner implements AutoCloseable {
     private final long cpuCapacityMillis;
     private final long memoryCapacityMb;
+    private final ExecutionLog executionLog;
     private final ScheduledExecutorService finishTimer =
             Executors.newSingleThreadScheduledExecutor(runnable -> new Thread(runnable, "task-timer"));
 
@@ -32,19 +33,23 @@ final class TaskRunner implements AutoCloseable {
     // Finished tasks the control plane has not been told about yet.
     private final List<String> unreportedFinishedIds = new ArrayList<>();
 
-    TaskRunner(long cpuCapacityMillis, long memoryCapacityMb) {
+    TaskRunner(long cpuCapacityMillis, long memoryCapacityMb, ExecutionLog executionLog) {
         this.cpuCapacityMillis = cpuCapacityMillis;
         this.memoryCapacityMb = memoryCapacityMb;
+        this.executionLog = executionLog;
     }
 
     /** Starts the task unless this assignment ID was seen before. Returns true if it started. */
-    synchronized boolean startIfNew(String assignmentId, long cpuMillis, long memoryMb, long durationMillis) {
+    synchronized boolean startIfNew(
+            String nodeId, String assignmentId, String jobId, long cpuMillis, long memoryMb, long durationMillis,
+            long leaderEpoch) {
         if (!seenAssignmentIds.add(assignmentId)) {
             return false;
         }
         ScheduledFuture<?> finish =
                 finishTimer.schedule(() -> finish(assignmentId), durationMillis, TimeUnit.MILLISECONDS);
-        runningTasks.put(assignmentId, new RunningTask(cpuMillis, memoryMb, finish));
+        runningTasks.put(assignmentId, new RunningTask(nodeId, jobId, cpuMillis, memoryMb, finish));
+        executionLog.started(nodeId, assignmentId, jobId, leaderEpoch);
         return true;
     }
 
@@ -74,7 +79,10 @@ final class TaskRunner implements AutoCloseable {
      * running them here as well would run them twice.
      */
     synchronized void stopAll() {
-        runningTasks.values().forEach(task -> task.finish().cancel(false));
+        runningTasks.forEach((assignmentId, task) -> {
+            task.finish().cancel(false);
+            executionLog.stopped(task.nodeId(), assignmentId, task.jobId());
+        });
         runningTasks.clear();
         // Those assignments are LOST on the control plane side, so there is no
         // point reporting them as finished.
@@ -86,8 +94,10 @@ final class TaskRunner implements AutoCloseable {
     }
 
     private synchronized void finish(String assignmentId) {
-        if (runningTasks.remove(assignmentId) != null) {
+        RunningTask task = runningTasks.remove(assignmentId);
+        if (task != null) {
             unreportedFinishedIds.add(assignmentId);
+            executionLog.finished(task.nodeId(), assignmentId, task.jobId());
         }
     }
 
@@ -103,5 +113,5 @@ final class TaskRunner implements AutoCloseable {
             List<String> runningAssignmentIds,
             List<String> finishedAssignmentIds) {}
 
-    private record RunningTask(long cpuMillis, long memoryMb, ScheduledFuture<?> finish) {}
+    private record RunningTask(String nodeId, String jobId, long cpuMillis, long memoryMb, ScheduledFuture<?> finish) {}
 }
