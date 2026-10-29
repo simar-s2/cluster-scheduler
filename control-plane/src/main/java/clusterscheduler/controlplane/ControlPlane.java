@@ -3,6 +3,9 @@ package clusterscheduler.controlplane;
 import clusterscheduler.controlplane.database.Database;
 import clusterscheduler.controlplane.database.SchemaInitializer;
 import clusterscheduler.controlplane.delivery.AssignmentSender;
+import clusterscheduler.controlplane.leadership.LeaderElector;
+import clusterscheduler.controlplane.leadership.Leadership;
+import clusterscheduler.controlplane.leadership.LeaseRepository;
 import clusterscheduler.controlplane.reconcile.ReconcileLoop;
 import clusterscheduler.controlplane.scheduling.SchedulingLoop;
 import clusterscheduler.controlplane.state.AssignmentRepository;
@@ -12,9 +15,11 @@ import clusterscheduler.controlplane.state.NodeRepository;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import java.io.IOException;
+import java.util.OptionalLong;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.LongConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,15 +30,24 @@ public final class ControlPlane implements AutoCloseable {
     private final Database database;
     private final Server grpcServer;
     private final AssignmentSender assignmentSender;
+    private final Leadership leadership;
+    private final LeaderElector leaderElector;
     // Every decision (placing tasks, declaring nodes dead) runs on this one
     // thread, so decisions never race each other inside a replica.
     private final ScheduledExecutorService decisionThread =
             Executors.newSingleThreadScheduledExecutor(runnable -> new Thread(runnable, "decisions"));
 
-    private ControlPlane(Database database, Server grpcServer, AssignmentSender assignmentSender) {
+    private ControlPlane(
+            Database database,
+            Server grpcServer,
+            AssignmentSender assignmentSender,
+            Leadership leadership,
+            LeaderElector leaderElector) {
         this.database = database;
         this.grpcServer = grpcServer;
         this.assignmentSender = assignmentSender;
+        this.leadership = leadership;
+        this.leaderElector = leaderElector;
     }
 
     public static ControlPlane start(ControlPlaneConfig config) throws IOException {
@@ -49,7 +63,12 @@ public final class ControlPlane implements AutoCloseable {
                 .addService(new ControlPlaneService(nodeRepository, heartbeatRepository, jobRepository))
                 .build()
                 .start();
-        ControlPlane controlPlane = new ControlPlane(database, grpcServer, assignmentSender);
+        Leadership leadership = new Leadership();
+        LeaderElector leaderElector = new LeaderElector(
+                config.replicaId(), new LeaseRepository(database), leadership,
+                config.leaseDurationMillis(), config.leaseRenewIntervalMillis());
+        ControlPlane controlPlane =
+                new ControlPlane(database, grpcServer, assignmentSender, leadership, leaderElector);
 
         SchedulingLoop schedulingLoop = new SchedulingLoop(
                 database, jobRepository, nodeRepository, assignmentRepository, assignmentSender,
@@ -57,8 +76,9 @@ public final class ControlPlane implements AutoCloseable {
         ReconcileLoop reconcileLoop = new ReconcileLoop(
                 database, nodeRepository, assignmentRepository, assignmentSender,
                 config.heartbeatTimeoutMillis(), config.resendAfterMillis());
-        controlPlane.repeatOnDecisionThread("scheduling", schedulingLoop::runOnce, config.schedulingIntervalMillis());
-        controlPlane.repeatOnDecisionThread("reconcile", reconcileLoop::runOnce, config.reconcileIntervalMillis());
+        controlPlane.repeatWhileLeader("scheduling", schedulingLoop::runOnce, config.schedulingIntervalMillis());
+        controlPlane.repeatWhileLeader("reconcile", reconcileLoop::runOnce, config.reconcileIntervalMillis());
+        leaderElector.start();
         return controlPlane;
     }
 
@@ -67,19 +87,33 @@ public final class ControlPlane implements AutoCloseable {
         return grpcServer.getPort();
     }
 
+    public boolean isLeader() {
+        return leadership.isLeader();
+    }
+
+    /** The epoch this replica leads under, or empty if it is a standby. */
+    public OptionalLong currentEpoch() {
+        return leadership.currentEpoch();
+    }
+
     public void awaitTermination() throws InterruptedException {
         grpcServer.awaitTermination();
     }
 
     /**
-     * Runs the step on a fixed delay. A failed run is logged and the next one
-     * still happens; without the catch, the executor would silently cancel
-     * the step after its first exception.
+     * Runs the step on a fixed delay, but only while this replica is the
+     * leader, and passes it the current epoch. A failed run is logged and the
+     * next one still happens; without the catch, the executor would silently
+     * cancel the step after its first exception.
      */
-    private void repeatOnDecisionThread(String stepName, Runnable step, long intervalMillis) {
+    private void repeatWhileLeader(String stepName, LongConsumer step, long intervalMillis) {
         decisionThread.scheduleWithFixedDelay(() -> {
+            OptionalLong epoch = leadership.currentEpoch();
+            if (epoch.isEmpty()) {
+                return;
+            }
             try {
-                step.run();
+                step.accept(epoch.getAsLong());
             } catch (RuntimeException failure) {
                 log.warn("{} step failed: {}", stepName, failure.getMessage());
             }
@@ -88,6 +122,7 @@ public final class ControlPlane implements AutoCloseable {
 
     @Override
     public void close() {
+        leaderElector.close();
         decisionThread.shutdownNow();
         grpcServer.shutdown();
         try {

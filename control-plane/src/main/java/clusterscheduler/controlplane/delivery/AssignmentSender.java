@@ -27,9 +27,10 @@ public final class AssignmentSender implements AutoCloseable {
     private final ExecutorService senderThreads =
             Executors.newFixedThreadPool(16, runnable -> new Thread(runnable, "assignment-sender"));
 
-    public void sendAll(List<Assignment> assignments) {
+    /** Sends each assignment, stamped with the epoch of the leader sending it. */
+    public void sendAll(List<Assignment> assignments, long leaderEpoch) {
         for (Assignment assignment : assignments) {
-            senderThreads.execute(() -> send(assignment));
+            senderThreads.execute(() -> send(assignment, leaderEpoch));
         }
     }
 
@@ -38,7 +39,7 @@ public final class AssignmentSender implements AutoCloseable {
         workerChannels.close(nodeId);
     }
 
-    private void send(Assignment assignment) {
+    private void send(Assignment assignment, long leaderEpoch) {
         AssignTaskRequest request = AssignTaskRequest.newBuilder()
                 .setAssignmentId(assignment.assignmentId())
                 .setJobId(assignment.jobId())
@@ -47,6 +48,7 @@ public final class AssignmentSender implements AutoCloseable {
                         .setCpuMillis(assignment.cpuMillis())
                         .setMemoryMb(assignment.memoryMb()))
                 .setDurationMillis(assignment.durationMillis())
+                .setLeaderEpoch(leaderEpoch)
                 .build();
         try {
             AssignTaskResponse response = workerChannels.stubFor(assignment.nodeId(), assignment.nodeAddress())

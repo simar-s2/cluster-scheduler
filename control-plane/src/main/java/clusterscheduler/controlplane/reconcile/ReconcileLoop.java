@@ -52,9 +52,10 @@ public final class ReconcileLoop {
         this.resendAfterMillis = resendAfterMillis;
     }
 
-    public void runOnce() {
+    /** Runs one pass as the leader of the given epoch. */
+    public void runOnce(long epoch) {
         handleDeadNodes();
-        resendUnconfirmedAssignments();
+        resendUnconfirmedAssignments(epoch);
     }
 
     private void handleDeadNodes() {
@@ -68,12 +69,12 @@ public final class ReconcileLoop {
         deadNodes.nodeIds().forEach(assignmentSender::forgetNode);
     }
 
-    private void resendUnconfirmedAssignments() {
+    private void resendUnconfirmedAssignments(long epoch) {
         List<Assignment> unconfirmed = database.inTransaction(connection ->
                 assignmentRepository.findUnconfirmed(connection, resendAfterMillis, MAX_RESENDS_PER_PASS));
         if (!unconfirmed.isEmpty()) {
             log.info("Resending {} unconfirmed assignment(s)", unconfirmed.size());
-            assignmentSender.sendAll(unconfirmed);
+            assignmentSender.sendAll(unconfirmed, epoch);
         }
     }
 }

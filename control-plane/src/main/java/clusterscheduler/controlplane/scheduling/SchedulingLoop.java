@@ -47,7 +47,8 @@ public final class SchedulingLoop {
         this.batchSize = batchSize;
     }
 
-    public void runOnce() {
+    /** Runs one pass as the leader of the given epoch. */
+    public void runOnce(long epoch) {
         List<PendingJob> pendingJobs = jobRepository.findPending(batchSize);
         if (pendingJobs.isEmpty()) {
             return;
@@ -61,7 +62,7 @@ public final class SchedulingLoop {
         List<Assignment> saved = database.inTransaction(
                 connection -> assignmentRepository.saveNew(connection, newAssignments));
         log.debug("Placed {} of {} pending jobs", saved.size(), pendingJobs.size());
-        assignmentSender.sendAll(saved);
+        assignmentSender.sendAll(saved, epoch);
     }
 
     private static Assignment toAssignment(Placement placement) {
