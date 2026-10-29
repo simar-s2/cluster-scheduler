@@ -65,4 +65,15 @@ class TaskRunnerTest {
         }
         throw new AssertionError(assignmentId + " never finished");
     }
+
+    @Test
+    void stopAllDropsRunningTasksButStillRemembersTheirIds() {
+        taskRunner.startIfNew("a1", 1_000, 2_000, 60_000);
+
+        taskRunner.stopAll();
+
+        assertEquals(List.of(), taskRunner.snapshot().runningAssignmentIds());
+        assertEquals(4_000, taskRunner.snapshot().freeCpuMillis());
+        assertFalse(taskRunner.startIfNew("a1", 1_000, 2_000, 60_000));
+    }
 }

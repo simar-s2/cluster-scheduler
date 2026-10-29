@@ -68,6 +68,19 @@ final class TaskRunner implements AutoCloseable {
         unreportedFinishedIds.removeAll(reportedIds);
     }
 
+    /**
+     * Stops every task. Used when the control plane says this node was
+     * declared dead: its tasks have already been given to other nodes, and
+     * running them here as well would run them twice.
+     */
+    synchronized void stopAll() {
+        runningTasks.values().forEach(task -> task.finish().cancel(false));
+        runningTasks.clear();
+        // Those assignments are LOST on the control plane side, so there is no
+        // point reporting them as finished.
+        unreportedFinishedIds.clear();
+    }
+
     synchronized List<String> runningAssignmentIds() {
         return List.copyOf(runningTasks.keySet());
     }

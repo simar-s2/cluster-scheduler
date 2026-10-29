@@ -71,8 +71,11 @@ final class HeartbeatLoop implements AutoCloseable {
         // them. If the call had failed, the next heartbeat would send them again.
         taskRunner.markFinishedReported(snapshot.finishedAssignmentIds());
         if (response.getMustReregister()) {
-            log.warn("Control plane no longer knows node {}; registering again", nodeId);
+            // Clear the ID first so no new assignment for the old node is
+            // accepted, then drop the tasks that were moved elsewhere.
+            log.warn("Node {} was declared dead; stopping its tasks and registering again", nodeId);
             identity.clear();
+            taskRunner.stopAll();
         }
     }
 
