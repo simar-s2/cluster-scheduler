@@ -43,7 +43,7 @@ public final class ReadmeResults {
                 millis(field(untilNewLeader, "median")) + " / " + millis(field(untilNewLeader, "p99")) + " / "
                         + millis(field(untilNewLeader, "max")), "failover-chaos.json"));
         rows.add(row("Jobs submitted during the failovers / finished",
-                field(jobs, "accepted").asLong() + " / " + field(jobs, "finished").asLong(), "failover-chaos.json"));
+                count(field(jobs, "accepted")) + " / " + count(field(jobs, "finished")), "failover-chaos.json"));
         rows.add(row("**Double placements:** jobs with overlapping active assignments (database)",
                 "**" + field(doubles, "jobsWithOverlappingActiveAssignmentsInDatabase").asLong() + "**",
                 "failover-chaos.json"));
@@ -73,7 +73,7 @@ public final class ReadmeResults {
                 "**" + percent(field(cpu, "mean")) + "** / " + percent(field(cpu, "min")), "packing.json"));
         rows.add(row("Memory utilization while jobs were waiting, mean",
                 percent(field(memory, "mean")), "packing.json"));
-        rows.add(row(field(config, "jobs").asLong() + " jobs on " + field(config, "nodes").asLong()
+        rows.add(row(count(field(config, "jobs")) + " jobs on " + count(field(config, "nodes"))
                         + " nodes: time until all finished / jobs per second",
                 String.format(Locale.ROOT, "%.0f s / %.1f", field(packing, "secondsUntilAllJobsFinished").asDouble(),
                         field(packing, "jobsFinishedPerSecond").asDouble()), "packing.json"));
@@ -107,6 +107,10 @@ public final class ReadmeResults {
 
     private static String row(String measurement, String result, String file) {
         return "| " + measurement + " | " + result + " | [" + file + "](results/" + file + ") |";
+    }
+
+    private static String count(JsonNode value) {
+        return String.format(Locale.ROOT, "%,d", value.asLong());
     }
 
     private static String millis(JsonNode value) {
