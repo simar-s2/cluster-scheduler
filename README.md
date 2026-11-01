@@ -98,6 +98,23 @@ A frozen leader that holds the lease lock cannot block a takeover forever, becau
 Measured on one MacBook (10 cores), with everything in Docker Desktop. The table is generated from [results/](results/) by `./gradlew :experiments:readmeResults`.
 
 <!-- results:start -->
+| Measurement | Result | From |
+|---|---|---|
+| Leader failovers (SIGKILL / pause) | 200 (100 / 100) | [failover-chaos.json](results/failover-chaos.json) |
+| Time until a new leader holds the lease, median / p99 / max | 1,769 ms / 2,367 ms / 2,449 ms | [failover-chaos.json](results/failover-chaos.json) |
+| Jobs submitted during the failovers / finished | 15,098 / 15,098 | [failover-chaos.json](results/failover-chaos.json) |
+| **Double placements:** jobs with overlapping active assignments (database) | **0** | [failover-chaos.json](results/failover-chaos.json) |
+| **Double placements:** jobs run on two nodes at once (worker logs) | **0** | [failover-chaos.json](results/failover-chaos.json) |
+| Jobs ever assigned to more than one node / assignments started twice | 0 / 0 | [failover-chaos.json](results/failover-chaos.json) |
+| Stale-leader writes rejected by the epoch check / frozen sessions ended by PostgreSQL | 1 / 0 | [failover-chaos.json](results/failover-chaos.json) |
+| Assignments workers rejected for a stale epoch | 0 | [failover-chaos.json](results/failover-chaos.json) |
+| Worker killed: time until all its tasks run elsewhere, median / max (5 trials) | 5,351 ms / 5,664 ms | [node-failure.json](results/node-failure.json) |
+| Worker killed: time until it is declared dead, median | 4,964 ms | [node-failure.json](results/node-failure.json) |
+| **CPU utilization** (allocated / capacity) while jobs were waiting, mean / min | **97.5%** / 90.4% | [packing.json](results/packing.json) |
+| Memory utilization while jobs were waiting, mean | 92.3% | [packing.json](results/packing.json) |
+| 10,000 jobs on 100 nodes: time until all finished / jobs per second | 388 s / 25.8 | [packing.json](results/packing.json) |
+| Mean scheduling pass on the leader (up to 1,000 jobs x 100 nodes) | 5.4 ms | [packing.json](results/packing.json) |
+| Memory per worker container (one node, small heap), mean / max | 41 MiB / 46 MiB | [packing.json](results/packing.json) |
 <!-- results:end -->
 
 How each number is measured:
