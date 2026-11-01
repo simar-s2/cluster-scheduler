@@ -79,6 +79,20 @@ sequenceDiagram
 
 [DESIGN.md](DESIGN.md) explains every part milestone by milestone: what was built, why, the tradeoffs, and the questions an interviewer might ask.
 
+## How it stays correct
+
+"A task is never placed on two nodes" does not rest on one mechanism. Each layer below would catch most mistakes on its own:
+
+1. **One decision thread per replica.** A leader never races itself.
+2. **Claiming a job is a compare-and-set.** `UPDATE jobs SET state = 'SCHEDULED' WHERE job_id = ? AND state = 'PENDING'` succeeds once per job.
+3. **A partial unique index** in PostgreSQL allows at most one active assignment per job, whatever the code does.
+4. **Fenced transactions.** Each leader transaction starts with `SELECT epoch FROM leader_lease FOR SHARE`. A stale epoch aborts it. The shared lock makes a takeover wait until in-flight writes commit, so leader terms never overlap in the database.
+5. **Worker epoch check.** An RPC is not a database write, so workers check the token themselves.
+6. **Dedupe by assignment ID.** Retries and resends are harmless.
+7. **Node ID check.** A new worker that inherits a dead worker's IP address does not run the dead worker's tasks.
+
+A frozen leader that holds the lease lock cannot block a takeover forever, because PostgreSQL ends any session that sits idle inside a transaction for 2 seconds.
+
 ## License
 
 MIT
