@@ -69,7 +69,7 @@ sequenceDiagram
         L->>L: best fit: tightest node that has room
         L->>DB: one transaction: check epoch FOR SHARE, claim job, insert assignment
         L->>W: AssignTask(assignment_id, node_id, epoch)
-        W->>W: check epoch, node ID, dedupe; start task
+        W->>W: check epoch, node ID and dedupe, then start the task
     end
     loop every second
         W->>R: Heartbeat(free space, running IDs, finished IDs)
