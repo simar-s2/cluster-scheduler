@@ -112,6 +112,47 @@ How each number is measured:
 
 **100 nodes, 100 containers.** Every node in the packing benchmark is its own worker container with its own JVM. To fit 100 JVMs into Docker Desktop's VM (under 8 GB on this laptop), workers run with a small heap and few threads; see `JAVA_OPTS` in `docker-compose.yml`. The table shows the measured memory per container, and even so the VM used swap during the run. On a smaller machine, `NODES_PER_PROCESS=N` runs N independent nodes in one container, each with its own gRPC server, registration, heartbeats, task runner and fencing state. The results above do not use it.
 
+## Quick start
+
+Requires Docker. Gradle downloads JDK 21 itself if needed.
+
+```sh
+./gradlew test                                        # unit and integration tests (Testcontainers starts PostgreSQL)
+docker compose up -d --build --wait --scale worker=5  # 3 replicas, PostgreSQL, 5 workers
+```
+
+Submit a job with [grpcurl](https://github.com/fullstorydev/grpcurl), to any replica (ports 9091 to 9093):
+
+```sh
+grpcurl -plaintext -import-path proto/src/main/proto -proto clusterscheduler/v1/control_plane.proto \
+  -d '{"job_id": "hello", "requested": {"cpu_millis": 500, "memory_mb": 256}, "duration_millis": 10000}' \
+  localhost:9091 clusterscheduler.v1.ControlPlane/SubmitJob
+```
+
+See who leads and what runs where:
+
+```sh
+docker compose exec postgres psql -U scheduler -c "SELECT holder, epoch, expires_at FROM leader_lease"
+docker compose exec postgres psql -U scheduler -c "SELECT job_id, node_id, epoch, state FROM assignments"
+curl -s localhost:8081/metrics | grep ^scheduler_   # replica 1; 8082 and 8083 for the others
+```
+
+Kill the leader and watch a standby take over with a higher epoch:
+
+```sh
+docker compose kill control-plane-1   # or whichever replica the lease names
+docker compose down -v                # stop everything and delete the data
+```
+
+Run the experiments. Each one starts its own fresh cluster, and writes `results/*.json` when it finishes:
+
+```sh
+./gradlew :experiments:failoverChaos    # 200 leader failovers
+./gradlew :experiments:nodeFailure      # kill workers, time the recovery
+./gradlew :experiments:packing          # 10,000 jobs on 100 nodes
+./gradlew :experiments:readmeResults    # rebuild the table above from results/
+```
+
 ## License
 
 MIT
