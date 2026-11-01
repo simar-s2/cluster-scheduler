@@ -57,3 +57,8 @@ registerExperiment(
     "packing",
     "clusterscheduler.experiments.PackingBenchmark",
     "Submit 10,000 jobs to 100 nodes and measure CPU utilization")
+
+registerExperiment(
+    "readmeResults",
+    "clusterscheduler.experiments.ReadmeResults",
+    "Rebuild the README results table from results/*.json")
