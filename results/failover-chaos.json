@@ -1,6 +1,6 @@
 {
   "experiment" : "failover-chaos",
-  "finishedAt" : "2026-10-29T21:59:44.745983Z",
+  "finishedAt" : "2026-10-29T22:36:45.131379Z",
   "config" : {
     "failovers" : 200,
     "workers" : 10,
@@ -14,17 +14,17 @@
     "byPause" : 100,
     "millisUntilNewLeader" : {
       "count" : 200,
-      "min" : 1260.0,
-      "median" : 1753.0,
-      "p99" : 2077.0,
-      "max" : 2110.0,
-      "mean" : 1744.255
+      "min" : 1324.0,
+      "median" : 1769.0,
+      "p99" : 2367.0,
+      "max" : 2449.0,
+      "mean" : 1766.505
     }
   },
   "jobs" : {
-    "accepted" : 14477,
+    "accepted" : 15098,
     "notAccepted" : 0,
-    "finished" : 14477,
+    "finished" : 15098,
     "acceptedButNeverFinished" : 0
   },
   "doublePlacements" : {
@@ -36,7 +36,7 @@
   "fencing" : {
     "highestEpoch" : 201,
     "controlPlaneWritesRejected" : 1,
-    "controlPlaneTransactionsEndedByIdleTimeout" : 1,
+    "controlPlaneTransactionsEndedByIdleTimeout" : 0,
     "workerStaleEpochRejections" : 0
   },
   "nodesDeclaredDead" : 0
