@@ -15,6 +15,70 @@ The hard part is failover. A leader that freezes (a long GC pause, a stopped con
 
 **Tech:** Java 21, Gradle, gRPC and Protocol Buffers, PostgreSQL 18 (plain JDBC with HikariCP), Docker Compose, JUnit 5 and Testcontainers, Micrometer with a Prometheus endpoint.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    client(["Job client"])
+
+    subgraph cp["Control plane: 3 replicas"]
+        direction TB
+        leader["Leader<br/>scheduling loop<br/>reconcile loop"]
+        standby1["Standby"]
+        standby2["Standby"]
+    end
+
+    subgraph pg["PostgreSQL"]
+        direction TB
+        lease[("leader_lease<br/>holder, epoch, expiry")]
+        state[("jobs · nodes · assignments")]
+    end
+
+    subgraph workers["Worker nodes"]
+        direction TB
+        w1["Worker"]
+        w2["Worker"]
+        w3["Worker ..."]
+    end
+
+    client -- "SubmitJob (any replica)" --> cp
+    workers -- "RegisterNode, Heartbeat (any replica)" --> cp
+    leader -- "AssignTask + epoch" --> workers
+    cp -- "lease renew / take over" --> lease
+    cp -- "fenced writes" --> state
+```
+
+- **Any replica accepts facts.** Job submissions, registrations and heartbeats are written to PostgreSQL by whichever replica receives them. That keeps them flowing while there is no leader, so a failover never makes healthy nodes look dead.
+- **Only the leader makes decisions,** on a single thread: placing jobs and declaring nodes dead. Each decision commits in a transaction that first locks the lease row and checks the epoch.
+- **The leader pushes assignments** to workers over gRPC, stamped with its epoch. A worker refuses an epoch older than one it has seen, an assignment meant for another node ID, and an assignment ID it has already handled.
+
+A job's life, from submission to completion:
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant R as Any replica
+    participant DB as PostgreSQL
+    participant L as Leader
+    participant W as Worker
+
+    C->>R: SubmitJob(job_id, cpu, memory)
+    R->>DB: INSERT job (PENDING), idempotent on job_id
+    loop every 100 ms
+        L->>DB: read pending jobs and free space per node
+        L->>L: best fit: tightest node that has room
+        L->>DB: BEGIN; check epoch FOR SHARE; job PENDING to SCHEDULED; insert assignment; COMMIT
+        L->>W: AssignTask(assignment_id, node_id, epoch)
+        W->>W: check epoch, node ID, dedupe; start task
+    end
+    loop every second
+        W->>R: Heartbeat(free space, running IDs, finished IDs)
+        R->>DB: assignment RUNNING / FINISHED, job FINISHED
+    end
+```
+
+[DESIGN.md](DESIGN.md) explains every part milestone by milestone: what was built, why, the tradeoffs, and the questions an interviewer might ask.
+
 ## License
 
 MIT
