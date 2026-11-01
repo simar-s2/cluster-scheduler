@@ -153,6 +153,30 @@ Run the experiments. Each one starts its own fresh cluster, and writes `results/
 ./gradlew :experiments:readmeResults    # rebuild the table above from results/
 ```
 
+## Project layout
+
+```
+proto/          the gRPC contract: ControlPlane and Worker services
+control-plane/  replica: API, lease election, fencing, scheduler, reconcile loop, metrics
+  database/       connection pool, transactions, schema setup
+  state/          SQL for nodes, jobs, assignments and heartbeats
+  leadership/     lease, local leadership view, fenced transactions
+  scheduling/     best-fit bin packing and the scheduling loop
+  reconcile/      dead-node handling and resending unconfirmed assignments
+  delivery/       pushing assignments to workers
+  metrics/        Micrometer counters and the /metrics endpoint
+worker/         node: registration, heartbeats, simulated tasks, epoch fence, dedupe
+experiments/    chaos, node failure and packing experiments, and the README table generator
+results/        the JSON files those experiments wrote
+```
+
+## Known limits
+
+- **PostgreSQL is a single point of failure.** Nothing can happen without it, which is also why leader election lives there.
+- **A worker cut off from the control plane keeps running its tasks** until it reconnects and is told it was declared dead. Self-fencing (a worker stops its own tasks after missing heartbeats for too long) would close that window.
+- **There are no schema migrations;** every run starts from an empty database.
+- **Tasks are simulated:** they hold their CPU and memory for their duration and do no work.
+
 ## License
 
 MIT
