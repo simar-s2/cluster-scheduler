@@ -1,6 +1,6 @@
 {
   "experiment" : "node-failure",
-  "finishedAt" : "2026-10-29T22:01:47.665851Z",
+  "finishedAt" : "2026-10-29T22:37:41.118598Z",
   "config" : {
     "workers" : 10,
     "trials" : 5,
@@ -15,44 +15,44 @@
   "trials" : [ {
     "trial" : 1,
     "tasksOnKilledNode" : 8,
-    "millisUntilDeclaredDead" : 4642,
-    "millisUntilAllTasksRunningElsewhere" : 5516
+    "millisUntilDeclaredDead" : 4653,
+    "millisUntilAllTasksRunningElsewhere" : 5351
   }, {
     "trial" : 2,
     "tasksOnKilledNode" : 8,
-    "millisUntilDeclaredDead" : 4657,
-    "millisUntilAllTasksRunningElsewhere" : 5401
+    "millisUntilDeclaredDead" : 4230,
+    "millisUntilAllTasksRunningElsewhere" : 5110
   }, {
     "trial" : 3,
     "tasksOnKilledNode" : 8,
-    "millisUntilDeclaredDead" : 4616,
-    "millisUntilAllTasksRunningElsewhere" : 5480
+    "millisUntilDeclaredDead" : 5124,
+    "millisUntilAllTasksRunningElsewhere" : 5567
   }, {
     "trial" : 4,
     "tasksOnKilledNode" : 8,
-    "millisUntilDeclaredDead" : 4401,
-    "millisUntilAllTasksRunningElsewhere" : 5013
+    "millisUntilDeclaredDead" : 5086,
+    "millisUntilAllTasksRunningElsewhere" : 5195
   }, {
     "trial" : 5,
     "tasksOnKilledNode" : 8,
-    "millisUntilDeclaredDead" : 4591,
-    "millisUntilAllTasksRunningElsewhere" : 4919
+    "millisUntilDeclaredDead" : 4964,
+    "millisUntilAllTasksRunningElsewhere" : 5664
   } ],
   "millisUntilDeclaredDead" : {
     "count" : 5,
-    "min" : 4401.0,
-    "median" : 4616.0,
-    "p99" : 4657.0,
-    "max" : 4657.0,
-    "mean" : 4581.4
+    "min" : 4230.0,
+    "median" : 4964.0,
+    "p99" : 5124.0,
+    "max" : 5124.0,
+    "mean" : 4811.4
   },
   "millisUntilAllTasksRunningElsewhere" : {
     "count" : 5,
-    "min" : 4919.0,
-    "median" : 5401.0,
-    "p99" : 5516.0,
-    "max" : 5516.0,
-    "mean" : 5265.8
+    "min" : 5110.0,
+    "median" : 5351.0,
+    "p99" : 5664.0,
+    "max" : 5664.0,
+    "mean" : 5377.4
   },
   "jobsWithOverlappingActiveAssignmentsInDatabase" : 0
 }
