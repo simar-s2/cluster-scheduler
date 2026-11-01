@@ -67,7 +67,7 @@ sequenceDiagram
     loop every 100 ms
         L->>DB: read pending jobs and free space per node
         L->>L: best fit: tightest node that has room
-        L->>DB: BEGIN; check epoch FOR SHARE; job PENDING to SCHEDULED; insert assignment; COMMIT
+        L->>DB: one transaction: check epoch FOR SHARE, claim job, insert assignment
         L->>W: AssignTask(assignment_id, node_id, epoch)
         W->>W: check epoch, node ID, dedupe; start task
     end
