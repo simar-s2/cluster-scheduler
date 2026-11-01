@@ -349,3 +349,59 @@ A plain read checks the epoch at one instant, and the takeover can commit right 
 
 **If PostgreSQL already rejects writes from a stale leader, why do workers check epochs too?**
 The `AssignTask` RPC happens after the database transaction, outside it. A stale leader can commit while still current, freeze, and send the RPC much later. The worker is a separate resource, so it has to check the token itself.
+
+## Milestone 7: chaos test, node failure test, packing benchmark
+
+### What was built
+
+- **An `experiments` module.** Each experiment is a plain Java program that starts a fresh cluster with Docker Compose, breaks it on purpose, measures what happens, writes `results/NAME.json`, and tears the cluster down. One Gradle task per experiment: `failoverChaos`, `nodeFailure`, `packing`.
+  - `FailoverChaosExperiment` takes the leader down 200 times while jobs keep arriving, alternating SIGKILL and `docker pause`, then counts double placements.
+  - `NodeFailureExperiment` kills the busiest worker container five times and times how long until all its tasks run elsewhere.
+  - `PackingBenchmark` submits 10,000 seeded jobs to 100 nodes and samples CPU utilization every second.
+- **Supporting pieces.**
+  - `DockerCompose` runs docker commands.
+  - `ClusterDatabase` reads PostgreSQL directly, including the overlap check on assignment history.
+  - `JobClient` and `JobStream` submit jobs.
+  - `Stats` computes median, p99 and max.
+  - `ResultsFile` writes the JSON.
+- **An execution log on every worker.** It is an append-only JSON-lines file of what the worker started, finished, stopped or rejected. `WorkerLogCheck` reads all of them and finds any job that ran on two nodes at overlapping times. It has unit tests with synthetic logs, showing it does detect double runs, so a result of 0 means something.
+- **Worker containers get a small heap and few threads** (`-Xmx24m`, serial GC, two Netty event loop threads), so 100 of them fit on a laptop. As a fallback for smaller machines, a worker process can also run several independent nodes (`NODES_PER_PROCESS`). The published results do not use it.
+- **The replicas' gRPC ports are published on localhost** (9091 to 9093), so experiments and grpcurl can submit jobs.
+
+### Why it is designed this way
+
+**Kills and pauses, not just kills.** A killed process never writes again, so killing the leader only tests failover. Freezing it with `docker pause` and unfreezing it after a standby has taken over is the scenario fencing exists for: the old leader resumes believing it might still lead. Alternating the two gives 100 of each.
+
+**Two independent sources for "double placement".** The database check reads the assignment history: did any job have two assignments active at overlapping times? It would be impossible to fail if the unique index were the only thing being tested, so a second source checks what actually happened. Workers log every task they really started and stopped, and the checker looks for a job running on two nodes at once. That would catch a task started without a record, or a duplicate delivery that slipped past dedupe.
+
+**The checker is tested to fail.** A zero only means something if the check could have found a problem. `WorkerLogCheckTest` feeds it overlapping runs on two nodes, a never-finished run, and duplicate starts, and asserts it reports each one.
+
+**The experiment counts which safety mechanism fired.** For the chaos run, the results record how many writes PostgreSQL rejected for a stale epoch (`FENCED:` log lines), how many frozen sessions PostgreSQL ended for the idle-in-transaction timeout, and how many assignments workers rejected for a stale epoch. A paused leader is only caught in the act if the pause lands inside a scheduling pass or between saving and sending, so these counts show how often the race actually happened rather than assuming it did.
+
+**Utilization is only counted while jobs are waiting.** At the start the queue fills and at the end it drains. In both phases idle CPU says nothing about packing. A sample counts only if at least one job was pending, because then the scheduler had work it could have placed, and any unused CPU is space it could not fill. Allocated CPU is the sum of the requests of `ASSIGNED` and `RUNNING` assignments. The CPU the workers themselves report as used is recorded next to it for comparison.
+
+**Results files first, README second.** Every experiment writes JSON. `ReadmeResults` (milestone 8) turns those files into the README table and fails if a field is missing, so a renamed field cannot quietly appear as a zero.
+
+**100 real containers, small heaps first.** The spec allowed simulating several nodes per container if 100 JVM containers were too heavy, but only after trying small heaps. With the flags above, each worker container's memory, recorded by the benchmark with `docker stats`, was small enough for all 100 to fit in Docker's VM alongside the control plane and PostgreSQL. It was tight, and the VM used swap. `NODES_PER_PROCESS` stays as an option for smaller machines.
+
+**The benchmark found a real bug.** The first 100-container run reported one node declared dead, in a run that kills nothing. All 100 workers had run to the end under a single node ID, and total capacity in every sample was exactly 100 nodes. So the dead node was an extra registration. With 100 JVMs starting at once, a `RegisterNode` call hit its 1-second deadline after the replica had already inserted the row. The worker retried and got a second node, and the first one never heartbeated. Nothing unsafe happened: anything the leader sent to the orphan carried its node ID, and the worker rejected it with `RESULT_WRONG_NODE`. The fix was to make registration idempotent, the same way job submission is. The worker picks a random registration ID, reuses it across retries, and the control plane inserts it with `ON CONFLICT DO NOTHING`. Every result in the README comes from runs after the fix.
+
+**Why allocated CPU reads above what workers report.** Allocated CPU counts a task from the moment the leader saves it until a heartbeat reports it finished. Workers report what they run as of their last heartbeat. A task that has just been placed, or has just finished, is in one figure but not yet the other, so the worker figure lags. Both are in `packing.json`. Utilization uses the allocated figure, because that is what the scheduler decided and what the spec defines.
+
+### Tradeoffs
+
+- **Experiments run against one laptop.** Every container shares 10 cores and one Docker VM, so absolute times include that contention. Ratios and the correctness counts transfer better than raw milliseconds.
+- **Times are measured from the host, by polling every 50 ms.** Failover time runs from when Docker reports the fault in place, so it slightly undercounts the time since the process actually died, and polling adds up to 50 ms.
+- **The chaos run only takes down control plane replicas.** Node deaths are tested separately, so a job moving between nodes during the chaos run would itself be a red flag. The results report how many nodes were declared dead during it.
+- **Pauses catch the leader mid-write only by chance.** The experiment does not inject artificial delays into the control plane to widen the race window. The fencing logic is tested directly by `FencedTransactionsTest` and the worker tests, and the chaos counts show how often the real race occurred.
+
+### Interview questions
+
+**How do you know your chaos test could catch a double placement?**
+The checker that reads worker logs has unit tests that feed it a job running on two nodes at once and assert it reports it. Separately, the database check is a plain SQL query over the assignment history, which anyone can rerun. Both are independent of the code that does the placing.
+
+**Why pause the leader instead of only killing it?**
+A killed process can never send a stale write, so killing only tests that a standby takes over. A paused process wakes up later with stale beliefs, and that is the case where a missing fence would cause a double placement.
+
+**Why count utilization only while jobs are waiting?**
+If nothing is waiting, low utilization just means low demand. When jobs are queued, any CPU left unallocated is space the scheduler could not use, often because what is left on each node is too small for any waiting job. That is the quantity bin packing is supposed to minimize.
