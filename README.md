@@ -93,6 +93,25 @@ sequenceDiagram
 
 A frozen leader that holds the lease lock cannot block a takeover forever, because PostgreSQL ends any session that sits idle inside a transaction for 2 seconds.
 
+## Results
+
+Measured on one MacBook (10 cores), with everything in Docker Desktop. The table is generated from [results/](results/) by `./gradlew :experiments:readmeResults`.
+
+<!-- results:start -->
+<!-- results:end -->
+
+How each number is measured:
+
+- **Failover chaos** (`FailoverChaosExperiment`): 3 replicas and 10 workers (4 cores and 8 GB each), with 20 jobs per second of 0.1 to 1 core and 1 to 5 seconds. Faults alternate between `docker compose kill -s SIGKILL` and `docker compose pause` on whichever replica holds the lease. The next fault waits until a replica holds an unexpired lease with a higher epoch. The killed or paused replica is then started or unpaused again. "Time until a new leader" runs from when Docker reports the fault in place until that new lease is visible (polled every 50 ms). After the last fault, the experiment waits for every accepted job to finish, then checks:
+  - the assignment history for any job with two assignments active at overlapping times;
+  - the workers' execution logs for any job that ran on two nodes at overlapping times.
+  
+  The worker-log checker has unit tests showing it does detect such overlaps.
+- **Node failure** (`NodeFailureExperiment`): 10 workers half filled with 40 long-running jobs. Each trial SIGKILLs the container of the busiest node and times, from when Docker reports it killed, (a) until the node is marked dead and (b) until every one of its tasks is confirmed `RUNNING` on another node. Defaults: a heartbeat every 1 s, dead after 5 s of silence, reconcile every 1 s.
+- **Packing** (`PackingBenchmark`): 100 nodes of 4 cores and 8 GB. 10,000 jobs are submitted at once, with CPU of 0.25 to 2 cores, memory of 256 MB to 4 GB and durations of 5 to 20 s, drawn from a fixed seed. Utilization is allocated CPU / total CPU capacity of live nodes, where allocated means the sum of the CPU requests of all `ASSIGNED` or `RUNNING` assignments. It is sampled every second, and only samples taken while at least one job was still waiting count, because then any idle CPU is space the scheduler could not use. An allocation lasts from the moment the leader saves it until a heartbeat reports the task finished, so it reads higher than the CPU the workers themselves report in use. That second figure lags by up to one heartbeat and is also recorded in `packing.json`.
+
+**100 nodes, 100 containers.** Every node in the packing benchmark is its own worker container with its own JVM. To fit 100 JVMs into Docker Desktop's VM (under 8 GB on this laptop), workers run with a small heap and few threads; see `JAVA_OPTS` in `docker-compose.yml`. The table shows the measured memory per container, and even so the VM used swap during the run. On a smaller machine, `NODES_PER_PROCESS=N` runs N independent nodes in one container, each with its own gRPC server, registration, heartbeats, task runner and fencing state. The results above do not use it.
+
 ## License
 
 MIT
