@@ -405,3 +405,43 @@ A killed process can never send a stale write, so killing only tests that a stan
 
 **Why count utilization only while jobs are waiting?**
 If nothing is waiting, low utilization just means low demand. When jobs are queued, any CPU left unallocated is space the scheduler could not use, often because what is left on each node is too small for any waiting job. That is the quantity bin packing is supposed to minimize.
+
+## Milestone 8: README with architecture, how to run, and measured results
+
+### What was built
+
+- **`README.md`** contains:
+  - a one-line summary;
+  - what the system does;
+  - a Mermaid architecture diagram and a sequence diagram of one job's life;
+  - the layered argument for "never on two nodes";
+  - the results table, with a note on how each number was measured;
+  - a quick start (tests, a live cluster, submitting a job with grpcurl, killing the leader, running the experiments);
+  - the project layout and known limits.
+- **`ReadmeResults`** (`./gradlew :experiments:readmeResults`) reads `results/failover-chaos.json`, `results/node-failure.json` and `results/packing.json` and rewrites only the part of the README between `<!-- results:start -->` and `<!-- results:end -->`.
+
+### Why it is designed this way
+
+**The table is generated, not written.** Typing numbers into a README invites rounding, wishful thinking and staleness after the next run. The generator makes the README a view over the result files, and the result files are what the experiments produced. Rerunning an experiment and then the generator updates the README with no manual step.
+
+**A missing field is an error.** Jackson's `path()` quietly returns 0 for a field that does not exist. A renamed field could then show up as "0 double placements", which is exactly the number that must never be made up. The generator reads every field through a helper that throws if it is missing.
+
+**Measurement notes sit next to the numbers.** A number without its definition is not useful in an interview. The README says, right under the table, what each experiment did, what the clock started and stopped on, and how 100 worker containers fit on a laptop.
+
+**Numbers appear only in the table.** The prose above it describes what was tested ("200 failovers", "10,000 jobs on 100 nodes"). Those are settings, not outcomes, so no result is ever stated in prose where it could drift from the files.
+
+### Tradeoffs
+
+- **The README shows one run.** Each experiment ran once for the table. Repeated runs with error bars would be stronger, at the cost of an hour or more of laptop time per round.
+- **The diagrams are hand-drawn Mermaid.** They have to be updated by hand if the architecture changes. Mermaid keeps them as text in the repository, so changes show up in diffs.
+
+### Interview questions
+
+**How do you know the numbers in your README are real?**
+Each experiment writes a JSON file at the end of its run, and the README table is generated from those files by a program in the repository. A missing field fails the generator instead of printing a default. Anyone can rerun the experiment and the generator and get a fresh table.
+
+**What would you measure next?**
+Repeated runs with confidence intervals; failover time with different lease durations (the tradeoff from milestone 5); utilization for first fit and worst fit next to best fit; and a network partition test (`docker network disconnect`) for the gap self-fencing would close.
+
+**What is the weakest part of the design?**
+PostgreSQL as a single point of failure, and the window in which a partitioned worker keeps running tasks that have already moved. Both are written up as known limits, with the standard fixes: a replicated PostgreSQL with automatic failover, and worker self-fencing.
