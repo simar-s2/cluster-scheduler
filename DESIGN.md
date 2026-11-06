@@ -1,6 +1,6 @@
 # Design
 
-This file grows by one section per milestone. Each section covers what was built, why it was designed that way, the tradeoffs, and questions an interviewer might ask.
+The overview comes first: the terms, one job's path through the system, the project layout, how each result is measured, and the known limits. After that there is one section per milestone, covering what was built, why it was designed that way, the tradeoffs, and questions an interviewer might ask.
 
 ## Terms
 
@@ -9,6 +9,68 @@ This file grows by one section per milestone. Each section covers what was built
 - **Assignment:** one placement of a job's task on a node. If a node dies, its jobs get new assignments on other nodes, so a job can have several assignments over its life, but never more than one active at a time.
 - **Leader:** the one control plane replica, out of three, that is allowed to make decisions (place tasks, declare nodes dead).
 - **Epoch:** a number that goes up by one every time a new leader takes over. It is the fencing token that lets everyone reject messages from a replaced leader.
+
+## One job's path through the system
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant R as Any replica
+    participant DB as PostgreSQL
+    participant L as Leader
+    participant W as Worker
+
+    C->>R: SubmitJob(job_id, cpu, memory)
+    R->>DB: INSERT job (PENDING), idempotent on job_id
+    loop every 100 ms
+        L->>DB: read pending jobs and free space per node
+        L->>L: best fit: tightest node that has room
+        L->>DB: one transaction: check epoch FOR SHARE, claim job, insert assignment
+        L->>W: AssignTask(assignment_id, node_id, epoch)
+        W->>W: check epoch, node ID and dedupe, then start the task
+    end
+    loop every second
+        W->>R: Heartbeat(free space, running IDs, finished IDs)
+        R->>DB: assignment RUNNING / FINISHED, job FINISHED
+    end
+```
+
+The layers behind "a task is never placed on two nodes" are listed under [milestone 6](#milestone-6-fencing-tokens-and-idempotent-assignments).
+
+## Project layout
+
+```
+proto/          the gRPC contract: ControlPlane and Worker services
+control-plane/  replica: API, lease election, fencing, scheduler, reconcile loop, metrics
+  database/       connection pool, transactions, schema setup
+  state/          SQL for nodes, jobs, assignments and heartbeats
+  leadership/     lease, local leadership view, fenced transactions
+  scheduling/     best-fit bin packing and the scheduling loop
+  reconcile/      dead-node handling and resending unconfirmed assignments
+  delivery/       pushing assignments to workers
+  metrics/        Micrometer counters and the /metrics endpoint
+worker/         node: registration, heartbeats, simulated tasks, epoch fence, dedupe
+experiments/    chaos, node failure and packing experiments, and the README table generator
+results/        the JSON files those experiments wrote
+scripts/        helpers behind the Makefile, such as cluster-status.sh
+docs/           the logo and the terminal recording scripts
+```
+
+## How each number is measured
+
+- **Leader crash test** (`FailoverChaosExperiment`): 3 replicas and 10 workers (4 cores and 8 GB each), with 20 jobs per second of 0.1 to 1 core and 1 to 5 seconds. Faults alternate between `docker compose kill -s SIGKILL` and `docker compose pause` on whichever replica holds the lease. The next fault waits until a replica holds an unexpired lease with a higher epoch. The killed or paused replica is then started or unpaused again. "Time to get a new leader" runs from when Docker reports the fault in place until that new lease is visible (polled every 50 ms). After the last fault, the experiment waits for every accepted job to finish, then checks:
+  - the assignment history for any job with two assignments active at overlapping times;
+  - the workers' execution logs for any job that ran on two nodes at overlapping times.
+- **Worker crash test** (`NodeFailureExperiment`): 10 workers and 40 long-running jobs of 0.5 cores each, half the cluster's CPU. Best fit packs them onto five full nodes and leaves five empty, so there is room to move a dead node's tasks. Each trial SIGKILLs the container of the busiest node and times, from when Docker reports it killed, (a) until the node is marked dead and (b) until every one of its tasks is confirmed `RUNNING` on another node. Defaults: a heartbeat every 1 s, dead after 5 s of silence, reconcile every 1 s.
+- **Packing test** (`PackingBenchmark`): 100 nodes of 4 cores and 8 GB. 10,000 jobs are submitted at once, with CPU of 0.25 to 2 cores, memory of 256 MB to 4 GB and durations of 5 to 20 s, drawn from a fixed seed. Utilization is allocated CPU / total CPU capacity of live nodes, where allocated means the sum of the CPU requests of all `ASSIGNED` or `RUNNING` assignments. It is sampled every second, and only samples taken while at least one job was still waiting count, because then any idle CPU is space the scheduler could not use. An allocation lasts from the moment the leader saves it until a heartbeat reports the task finished, so it reads higher than the CPU the workers themselves report in use, which lags by up to one heartbeat.
+- **Workers in the packing test:** every node is its own worker container with its own JVM. To fit 100 JVMs into Docker Desktop's VM (under 8 GB on this laptop), workers run with a small heap and few threads; see `JAVA_OPTS` in `docker-compose.yml`. Even so, the VM used swap during the run. On a smaller machine, `NODES_PER_PROCESS=N` runs N independent nodes in one container, each with its own gRPC server, registration, heartbeats, task runner and fencing state. The published results do not use it.
+
+## Known limits
+
+- **PostgreSQL is a single point of failure.** Nothing can happen without it, which is also why leader election lives there.
+- **A worker cut off from the control plane keeps running its tasks** until it reconnects and is told it was declared dead. Self-fencing (a worker stops its own tasks after missing heartbeats for too long) would close that window.
+- **There are no schema migrations;** every run starts from an empty database.
+- **Tasks are simulated:** they hold their CPU and memory for their duration and do no work.
 
 ## Milestone 1: project setup, protobuf contract, PostgreSQL
 
@@ -384,7 +446,11 @@ The `AssignTask` RPC happens after the database transaction, outside it. A stale
 
 **100 real containers, small heaps first.** The spec allowed simulating several nodes per container if 100 JVM containers were too heavy, but only after trying small heaps. With the flags above, each worker container's memory, recorded by the benchmark with `docker stats`, was small enough for all 100 to fit in Docker's VM alongside the control plane and PostgreSQL. It was tight, and the VM used swap. `NODES_PER_PROCESS` stays as an option for smaller machines.
 
-**The benchmark found a real bug.** The first 100-container run reported one node declared dead, in a run that kills nothing. All 100 workers had run to the end under a single node ID, and total capacity in every sample was exactly 100 nodes. So the dead node was an extra registration. With 100 JVMs starting at once, a `RegisterNode` call hit its 1-second deadline after the replica had already inserted the row. The worker retried and got a second node, and the first one never heartbeated. Nothing unsafe happened: anything the leader sent to the orphan carried its node ID, and the worker rejected it with `RESULT_WRONG_NODE`. The fix was to make registration idempotent, the same way job submission is. The worker picks a random registration ID, reuses it across retries, and the control plane inserts it with `ON CONFLICT DO NOTHING`. Every result in the README comes from runs after the fix.
+**The benchmark exposed a weakness in registration.** The first 100-container run reported one node declared dead, in a run that kills nothing. All 100 workers had run to the end under a single node ID, and total capacity in every sample was exactly 100 nodes, so the dead node ran no tasks and was gone before sampling began. The experiment had already deleted the containers and their logs, so the cause can't be proven. The likeliest explanation is that, with 100 JVMs starting at once, a `RegisterNode` call hit its 1-second deadline after the replica had already inserted the row. The worker retried and got a second node, and the first one never heartbeated. The evidence also fits a worker whose first heartbeats were too late, and which registered again before it had any tasks. Later, the old code started 100 workers once more without a dead node, so the failure is not easy to trigger.
+
+Either way, a retried registration could leave an orphan, so it was worth fixing. Nothing unsafe could come from an orphan: anything the leader sent to it carried its node ID, and the worker would reject that with `RESULT_WRONG_NODE`. The fix was to make registration idempotent, the same way job submission is. The worker picks a random registration ID, reuses it across retries, and the control plane inserts it with `ON CONFLICT DO NOTHING`. The run after the fix had no dead nodes, and every result in the README comes from runs after the fix.
+
+**A container costs more than its JVM.** `docker stats` put each worker at about 41 MiB, which adds up to about 4 GB, yet the VM was nearly full and using swap. Listing the VM's processes with 100 workers running showed why: `containerd-shim` used about 1.5 GB across its 105 processes, and `dockerd` about 800 MB.
 
 **Why allocated CPU reads above what workers report.** Allocated CPU counts a task from the moment the leader saves it until a heartbeat reports it finished. Workers report what they run as of their last heartbeat. A task that has just been placed, or has just finished, is in one figure but not yet the other, so the worker figure lags. Both are in `packing.json`. Utilization uses the allocated figure, because that is what the scheduler decided and what the spec defines.
 
@@ -410,15 +476,9 @@ If nothing is waiting, low utilization just means low demand. When jobs are queu
 
 ### What was built
 
-- **`README.md`** contains:
-  - a one-line summary;
-  - what the system does;
-  - a Mermaid architecture diagram and a sequence diagram of one job's life;
-  - the layered argument for "never on two nodes";
-  - the results table, with a note on how each number was measured;
-  - a quick start (tests, a live cluster, submitting a job with grpcurl, killing the leader, running the experiments);
-  - the project layout and known limits.
-- **`ReadmeResults`** (`./gradlew :experiments:readmeResults`) reads `results/failover-chaos.json`, `results/node-failure.json` and `results/packing.json` and rewrites only the part of the README between `<!-- results:start -->` and `<!-- results:end -->`.
+- **`README.md`**, laid out like my other projects' READMEs. It has a logo, a one-line summary and badges, then what it does, how it works (with a Mermaid architecture diagram), the results tables, how to run it, and things I learned. The longer material, such as the job lifecycle diagram, measurement notes, project layout and known limits, lives at the top of this file.
+- **`Makefile`** and **`scripts/`**, with short commands for the cluster and the experiments: `make cluster-up`, `make jobs`, `make cluster-status`, `make kill-leader`, `make kill-worker`, `make chaos`, `make results`. `SubmitJobs` submits jobs by hand, so trying the cluster needs no extra gRPC tool.
+- **`ReadmeResults`** (`make results`) reads `results/failover-chaos.json`, `results/node-failure.json` and `results/packing.json` and rewrites only the part of the README between the `results:begin` and `results:end` comments.
 
 ### Why it is designed this way
 
@@ -426,9 +486,9 @@ If nothing is waiting, low utilization just means low demand. When jobs are queu
 
 **A missing field is an error.** Jackson's `path()` quietly returns 0 for a field that does not exist. A renamed field could then show up as "0 double placements", which is exactly the number that must never be made up. The generator reads every field through a helper that throws if it is missing.
 
-**Measurement notes sit next to the numbers.** A number without its definition is not useful in an interview. The README says, right under the table, what each experiment did, what the clock started and stopped on, and how 100 worker containers fit on a laptop.
+**Definitions stay close to the numbers.** A number without its definition is not useful in an interview. The README says, right above the tables, what each test does and how utilization is defined. The full measurement notes are one link away, in this file.
 
-**Numbers appear only in the table.** The prose above it describes what was tested ("200 failovers", "10,000 jobs on 100 nodes"). Those are settings, not outcomes, so no result is ever stated in prose where it could drift from the files.
+**Results appear only in the tables.** The prose around them describes what was tested ("200 failovers", "10,000 jobs on 100 workers"). Those are settings, not outcomes, so no result is ever stated in prose where it could drift from the files.
 
 ### Tradeoffs
 
