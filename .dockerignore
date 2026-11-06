@@ -4,3 +4,7 @@
 .idea
 **/build
 results
+docs
+scripts
+Makefile
+*.md
