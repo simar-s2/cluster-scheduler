@@ -61,4 +61,9 @@ registerExperiment(
 registerExperiment(
     "readmeResults",
     "clusterscheduler.experiments.ReadmeResults",
-    "Rebuild the README results table from results/*.json")
+    "Rebuild the README results tables from results/*.json")
+
+registerExperiment(
+    "submitJobs",
+    "clusterscheduler.experiments.SubmitJobs",
+    "Submit a few jobs to a running cluster, for trying it out by hand")
